@@ -1,0 +1,624 @@
+    @font-face{ font-family: PixelText-Heading; src: url('../fonts/Fipps-Regular.otf');}
+    @font-face{ font-family: PixelText; src: url('../fonts/thin_pixel-7.ttf');}
+    
+    html 
+    {
+        height: 100%;
+    }
+    body
+    {   
+        font-family: PixelText;
+        padding:0;
+        margin:0;
+        color: 	#000000;
+        font-size: 35px;
+        line-height: 54%;
+        height: 100%;
+
+        background: #80bfff; /* For browsers that do not support gradients */
+    }
+    
+    p 
+    {
+        margin-bottom:0em;
+        margin-top:0px;
+        padding:10px;
+    }
+    h1
+    {
+        font-family: PixelText-Heading;
+        font-size: 20px;
+        
+    }
+
+    h2
+    {
+        font-family: PixelText-Heading;
+        font-size: 10px;
+        padding: 10px 10px 1px 25px;
+        
+    }
+    /* Global */
+    .container
+    {
+    	width:80%;
+    	margin:auto;
+    	overflow:hidden;
+    }
+    
+     /* Global */
+    .container-body
+    {
+    	width:25%;
+    	margin:auto;
+    	overflow:hidden;
+        padding:0px;
+        max-width: 1087px;
+         min-width: 750px;
+        background-color: #ffe680;
+
+        /*Curtosy of Alberto Para*/
+        /*https://codepen.io/albpara/pen/xDBvc*/ 
+
+        box-shadow: 16px 0 transparent, -16px 0 transparent, 0 -16px transparent, 0 16px transparent, 4px 0 0 8px 
+        transparent, -4px 0 0 8px transparent, 0 -4px 0 8px transparent, 0 4px 0 8px transparent, 20px 0 #ffe680, -20px 0 
+        #ffe680, 0 -20px #ffe680, 0 20px #ffe680, 0 0 0 12px #ffe680, 0 8px 0 8px #ffe680, 0 -8px 0 8px 
+        #ffe680, 8px 0 0 8px #ffe680, -8px 0 0 8px #ffe680;
+        margin: 20px auto;
+    }
+
+    .Skills-Container
+    {
+    	width:80%;
+    	margin:0px;
+    	overflow:hidden;
+    }
+
+    .card .card-content 
+    {
+    padding: 2px 15px 2px 15px;
+    border-radius: 0px;
+    }
+
+    .card p
+    {
+        padding: 0px;
+    }
+
+    canvas 
+    {
+        image-rendering: optimizeSpeed;             /* Older versions of FF          */
+        image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+        image-rendering: -webkit-optimize-contrast; /* Safari                        */
+        image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+        image-rendering: pixelated;                 /* Awesome future-browsers       */
+        -ms-interpolation-mode: nearest-neighbor;   /* IE     */
+    }   
+    .extra .row 
+    {
+        color: inherit;
+    }
+
+    #SaIT
+    {
+        background-color: #ff6666;
+        
+    }
+
+    #AnD
+    {
+        background-color: #b3ff99;
+        
+    }
+
+    #AnM
+    {
+        background-color: #ffe680;
+        
+    }
+    ul
+    {
+    	margin:0;
+    	padding:0;
+    }
+    
+    .dark
+    {
+    	background:#143B5B;
+    	color:#ffffff;
+    	margin-top: 10px;
+    	margin-bottom: 10px;
+    
+        box-shadow: 16px 0 transparent, -16px 0 transparent, 0 -16px transparent, 0 16px transparent, 4px 0 0 8px 
+        transparent, -4px 0 0 8px transparent, 0 -4px 0 8px transparent, 0 4px 0 8px transparent, 20px 0 #ff4d4d, -20px 0 
+        #ff4d4d, 0 -20px #ff4d4d, 0 20px #ff4d4d, 0 0 0 12px #ff4d4d, 0 8px 0 8px #ff4d4d, 0 -8px 0 8px 
+        #ff4d4d, 8px 0 0 8px #ff4d4d, -8px 0 0 8px #ff4d4d;
+        margin: 20px auto;
+    }
+    
+    a, a:link, a:visited, a:focus, a:active
+    {
+        text-decoration:none; 
+	}
+	
+     a:hover.sLinks
+     {
+     	filter:  invert(45%);
+     }
+       
+     a:hover.divlink 
+     {
+         color: #e8491d ;
+     }
+    
+     
+    /*Header **/
+    header
+    {
+        background: #ff4d4d;
+        color: 	#ffffff;
+        padding:10px;
+        min-height:20px;
+        width: 100%;
+        
+    }
+    
+     a.divlink
+    {
+    	color:#000000 ;
+    	text-decoration:none;
+    	text-transform: uppercase;
+    	font-size:36px;
+    	
+    }
+
+     header #branding a.heading
+    {
+        font-family: PixelText-Heading;
+     	color:#000000 ;
+    	text-decoration:none;
+    }
+
+    header li
+    { 
+    	display:inline;
+    	padding: 0 20px 0 20px;
+    }
+    
+    header #branding
+    {
+    	float:left;
+    }
+    
+    header #branding h1
+    {
+        margin:0; 
+    }
+    
+    header nav
+    {
+    float:right;
+    margin-top:10px;
+    background-color: transparent;
+
+        /* -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2); */
+    box-shadow: 0 2px 2px 0 transparent, 0 1px 5px 0 
+    transparent, 0 3px 1px -2px transparent;
+
+    -webkit-box-shadow: 0 2px 2px 0
+        transparent, 0 1px 5px 0 transparent, 0 3px 1px -2px transparent;
+    }
+    
+    header li img
+    {
+         width:35px;
+         image-rendering: pixelated;
+         margin: auto;
+    }
+    
+    .IconLink
+    {   
+    	float:left;  	
+    }
+        
+    header .highlight, header .current a
+    {
+    	color:#ffffff;
+    	font-weight:bold;
+    }
+
+    #header.container {
+        margin-left: 20px;
+        margin-bottom: -10px;
+    }
+
+     #nav-open .col.s2{
+        margin-top: 5px;
+    }
+    #main
+    {
+        padding:0px;
+    }
+    /* Showcase */
+    #showcase
+    {
+    	min-height:300px;
+    	background:url('../img/DayTime_Calm.png') no-repeat center center fixed;
+    	background-size: 3000px 100%;
+    	text-align:centre;
+    	color:#000000;
+    }
+    
+     #showcase h1
+    {
+    	margin-top: 100px;
+    	font-size:55px;
+    	margin-bottom:10px;
+    }
+    
+    #showcase p
+    {
+    	font-size:20px;
+    }
+    
+     /* WeblGl Scene Container*/
+      #webGL-container .canvas
+      {
+      image-rendering: pixelated;
+      }
+
+    canvas
+    {
+        display: block;
+        overflow: hidden; 
+    }
+
+     #webGL-container
+    {
+        overflow: hidden; 
+        text-align: center;
+        width: 100%;
+        height: 100%;
+    }
+    #webGL-container h1
+    {
+        float:left;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-top: 200px;
+        margin-left: -100px;
+    }
+
+    #webGL-container nav
+    {
+        background-color: transparent;
+        float:left;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-top: 200px;
+        margin-left: -360px;
+        box-shadow:0px;
+
+        -webkit-box-shadow:0 0px 0px 0 rgba(0, 0, 0, 0), 0 0px 0px 0
+         rgba(0, 0, 0, 0), 0 0px 0px 0px rgba(0, 0, 0, 0);
+
+         box-shadow:0 0px 0px 0 rgba(0, 0, 0, 0), 0 0px 0px 0
+         rgba(0, 0, 0, 0), 0 0px 0px 0px rgba(0, 0, 0, 0);
+    }
+    #webGL-container li
+    {
+        padding: 30px;
+    }
+
+     #webGL-container a
+     {
+        font-family: PixelText-Heading;
+        font-size: 25px;
+     }
+
+     #tickleBox
+     {
+        border: 1px solid white;
+        width: 300px;
+        height: 300px;
+        color:#3385ff;
+     }
+     #webGL-container a:hover
+     {
+        font-size: 30px;
+        padding: 0px;
+        margin: 0px;
+        color:#3385ff;
+     }
+     /* Boxes */
+    #boxes .box
+    {
+    
+    width: 30%;
+    padding: 10px;
+    text-align: center;
+    float: left;     
+    }
+    
+    #boxes .box img
+    {
+    	width: 75px;
+    }
+    
+    #nav-open
+    {
+        margin-top: 10px;
+    }
+
+    #nav-open span
+    {
+        cursor: pointer;
+    }
+     /* Side Bar*/
+    aside#sidebar
+    {
+    	float:left;
+    	width: 250px;
+        margin-top: 20px;
+        padding: 20px;
+        margin-left: 12px;
+    }
+    
+     aside#sidebar img
+    {
+	 text-align: center;
+        width:100%;
+
+    }
+    
+    
+     /* Main-col*/
+     article#main-col
+     {
+     	float:right;
+         width: 65%;
+         padding:20px;
+     }
+    
+    
+    
+    /*Resume */
+    article#main-col .page-title
+    {  
+         color:#000000;
+    }
+    
+    ul#services li
+    {
+    	list-style:none;
+    	padding: 10px;
+    	border: #cccccc solid 5px;
+    	margin-bottom:1px;
+    	background:#e6e6e6;
+    	
+    }
+    
+    ul#collapsible
+    {
+            float: left;
+    }
+    ul#services  p
+    {
+    	list-style:none;
+    	background:#e6e6e6;
+    	margin:0;
+    	padding:0;
+    }
+    
+    .panel-title a 
+    { 
+      	text-decoration:none;
+    }
+    
+    .panel-heading:hover
+    {
+        color:#ffffff;
+    	background-color:#e8491d;
+    }
+    
+    .panel-collapse-clickable 
+    {
+     cursor: pointer;  
+    }
+
+    footer
+    {
+ 
+        color:#ffffff;
+        background-color:#ff4d4d;
+        text-align: center;
+        position: fixed;
+        height: 50px;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+        margin-bottom: 0px;
+    }
+      footer p
+    {
+        line-height: 1px;
+        margin-top: 25px;
+    }
+    /*Media Queries */
+    
+        
+@media(max-width: 870px)
+{
+    .container-body
+    {
+    float: none;
+    min-width: 700px;
+    }
+
+    aside#sidebar {
+    float: none;
+    padding: 20px;
+
+    
+
+}
+}
+    @media(max-width: 768px)
+    {
+	header #branding,
+	header nav,
+	header nav li,
+	#boxes .box,
+	article#main-col,
+	aside#sidebar
+	{
+	    float:none;	
+        width:100%;
+
+        margin: auto;
+	}
+     html 
+    {
+        height: 100%;
+    }
+    body
+    {  
+        height: 100%;
+    }
+    section#main
+    {
+        width:100%;
+    }
+    aside#sidebar
+    {
+        width: 50%;
+        padding: 10px;
+        left: 150%;
+        margin: auto;
+        max-width: 50%;
+        min-width: 200px;
+    }
+
+	.container-body
+    {
+    	width:80%;
+        overflow:hidden;
+        min-width: 200px;
+    }
+    
+     header .IconLink
+     {
+      	text-align:center;
+     }
+	header
+	{
+	    padding-bottom:20px;
+	}
+	
+	#showcase h1
+	{
+	   margin-top:40px;
+	}
+    }
+
+  @media(max-width: 1080px)
+    {
+    header #branding,
+    header nav,
+    header nav li,
+    header .IconLink
+     {
+      	float:none;	
+	    text-align:center;
+	    width:100%;
+     }
+    
+    }
+     
+
+ul{
+ list-style-type: none;
+
+}
+
+/* The side navigation menu */
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #111; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+/* The navigation menu links */
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+    transition: margin-left .5s;
+        padding: 50px 50px 10px 50px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) 
+{
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
