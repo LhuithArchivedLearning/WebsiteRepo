@@ -9,12 +9,21 @@
     // Custom global variables
     var mouse = {x: 0, y: 0};
 
+    var octaves = 5; 
+    var persistance; 
+    var lacunarity = 2.05; 
+    var seed = 1;
+    var noiseScale = 100; 
+    var offset = {x:0, y:0};
+    var textureSize = 256;
+
 	init();
 	animate();
 	
         function init()
         {    
-
+            CalculateParametres();
+            
     // Planet Data
     // radius - planet radius in millions of meters
     // tilt - planet axis angle
@@ -38,13 +47,14 @@
 
         //Creates empty scene object and renderers
             resolution = 3;
-            textureSize = 256;
             planetSize = 100;
             moonSize = 20;
 
         clock = new THREE.Clock();
 
-        var map = new MapGenerator(3, 0.5, 2, 1, 75, new Vector2(0,0), textureSize);
+
+        var map = new MapGenerator(octaves, persistance, lacunarity, 
+            seed, noiseScale, offset, textureSize);
 
         const dataTexture = new THREE.DataTexture
         (
@@ -240,7 +250,8 @@
 
     function render()
     {
- 	    renderer.render( scene, camera );
+         renderer.render( scene, camera );
+             console.log(persistance);
     }
 
     function MouseInPlanet(object, rad)
@@ -360,6 +371,11 @@
 
     };
 
+    function CalculateParametres()
+    {
+        persistance = randomRange(0.35, 1.55);
+    }
+
     function createPlanet(init)
     {
         if(!init)
@@ -367,6 +383,7 @@
             scene.remove(planet);
             scene.remove(moon);
             scene.remove(outline);
+            CalculateParametres();
         }
 
             var segmentCount = 32,
@@ -389,7 +406,9 @@
             
             if(!scene.getObjectByName('outline')) scene.add(outline);
 
-        var map = new MapGenerator(3, 0.5, 2, 1, 75, new Vector2(0,0), textureSize);
+        
+        var map = new MapGenerator(octaves, persistance, lacunarity, 
+            seed, noiseScale, offset, textureSize);
 
         const dataTexture = new THREE.DataTexture
         (

@@ -1,6 +1,6 @@
 var regions = 
 [
- new TerrainType("water deep", 0, new THREE.Color(102, 140, 255)),
+ new TerrainType("water deep", 0, new THREE.Color(0, 140, 255)),
  new TerrainType("water shallow", 0.48, new THREE.Color(102, 179, 255)),
  new TerrainType("sand", .56, new THREE.Color( 255, 204, 102 )),
  new TerrainType("grass", .6, new THREE.Color( 89, 204, 51)),
