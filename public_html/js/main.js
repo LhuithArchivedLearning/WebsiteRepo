@@ -9,11 +9,11 @@
     // Custom global variables
     var mouse = {x: 0, y: 0};
 
-    var octaves = 5; 
+    var octaves; 
     var persistance; 
-    var lacunarity = 2.05; 
+    var lacunarity; 
     var seed = 1;
-    var noiseScale = 100; 
+    var noiseScale; 
     var offset = {x:0, y:0};
     var textureSize = 256;
 
@@ -46,9 +46,9 @@
      };
 
         //Creates empty scene object and renderers
-            resolution = 3;
-            planetSize = 100;
-            moonSize = 20;
+        resolution = 3;
+        planetSize = 100;
+        moonSize = 20;
 
         clock = new THREE.Clock();
 
@@ -251,7 +251,6 @@
     function render()
     {
          renderer.render( scene, camera );
-             console.log(persistance);
     }
 
     function MouseInPlanet(object, rad)
@@ -373,7 +372,10 @@
 
     function CalculateParametres()
     {
-        persistance = randomRange(0.35, 1.55);
+        persistance = randomRange(0.65, 0.85);
+        lacunarity = randomRange(1.9, 2.2);
+        octaves = Math.round(randomRange(4,6));
+        noiseScale = randomRange(100, 120);
     }
 
     function createPlanet(init)
