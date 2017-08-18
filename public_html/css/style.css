@@ -60,11 +60,34 @@
         /*Curtosy of Alberto Para*/
         /*https://codepen.io/albpara/pen/xDBvc*/ 
 
-        box-shadow: 16px 0 transparent, -16px 0 transparent, 0 -16px transparent, 0 16px transparent, 4px 0 0 8px 
-        transparent, -4px 0 0 8px transparent, 0 -4px 0 8px transparent, 0 4px 0 8px transparent, 20px 0 #ffe680, -20px 0 
-        #ffe680, 0 -20px #ffe680, 0 20px #ffe680, 0 0 0 12px #ffe680, 0 8px 0 8px #ffe680, 0 -8px 0 8px 
-        #ffe680, 8px 0 0 8px #ffe680, -8px 0 0 8px #ffe680;
-        margin: 20px auto;
+       box-shadow: 4px 0 #ffe680, -4px 0 #ffe680, 0 -4px #ffe680, 0 4px #ffe680, 
+  8px 0 #ffe680, -8px 0 #ffe680, 0 -8px #ffe680, 0 8px #ffe680, 0 0 0 4px #ffe680;
+  margin: 8px auto;
+    }
+
+    .portfolio-body
+    {
+    	width:95%;
+    	margin:auto;
+    	overflow:hidden;
+        padding:0px;
+        max-width: 1087px;
+         min-width: 750px;
+        background-color: #ffe680;
+
+        /*Curtosy of Alberto Para*/
+        /*https://codepen.io/albpara/pen/xDBvc*/ 
+
+       box-shadow: 4px 0 #ffe680, -4px 0 #ffe680, 0 -4px #ffe680, 0 4px #ffe680, 
+  8px 0 #ffe680, -8px 0 #ffe680, 0 -8px #ffe680, 0 8px #ffe680, 0 0 0 4px #ffe680;
+  margin: 8px auto;
+    }
+
+    h1, h2, h3, h4, h5, h6 
+    {
+        padding: 5px;
+        font-weight: 400; 
+        line-height: 1.1; 
     }
 
     .Skills-Container
@@ -74,16 +97,23 @@
     	overflow:hidden;
     }
 
-    .card .card-content 
-    {
-    padding: 2px 15px 2px 15px;
-    border-radius: 0px;
-    }
-
     .card p
     {
         padding: 0px;
     }
+    .card
+    {
+        border-radius: 0px;
+         box-shadow: 4px 0 #ff6666, -4px 0 #ff6666, 0 -4px #ff6666, 0 4px #ff6666, 
+  8px 0 #ff6666, -8px 0 #ff6666, 0 -8px #ff6666, 0 8px #ff6666, 0 0 0 4px #ff6666;
+  margin: 8px auto;
+  margin: 25px 0px 0px 0px;
+    }
+    .card .card-content
+    {
+    padding: 0px 5px 0px 5px;
+    
+}
 
     canvas 
     {
@@ -103,6 +133,21 @@
     {
         background-color: #ff6666;
         
+        
+    }
+
+    .card h3
+    {
+       margin: 0px;
+       padding: 0px 5px;
+       font-weight: 400;
+    }
+
+    .card p
+    {
+  box-shadow: 4px 0 #ff6666, -4px 0 #ff6666, 0 -4px #ff6666, 0 4px #ff6666, 
+  8px 0 #ff6666, -8px 0 #ff6666, 0 -8px #ff6666, 0 8px #ff6666, 0 0 0 4px #ff6666;
+  margin: 8px auto;
     }
 
     #AnD
@@ -124,16 +169,14 @@
     
     .dark
     {
-    	background:#143B5B;
+    	background:#ff6666;
     	color:#ffffff;
     	margin-top: 10px;
     	margin-bottom: 10px;
     
-        box-shadow: 16px 0 transparent, -16px 0 transparent, 0 -16px transparent, 0 16px transparent, 4px 0 0 8px 
-        transparent, -4px 0 0 8px transparent, 0 -4px 0 8px transparent, 0 4px 0 8px transparent, 20px 0 #ff4d4d, -20px 0 
-        #ff4d4d, 0 -20px #ff4d4d, 0 20px #ff4d4d, 0 0 0 12px #ff4d4d, 0 8px 0 8px #ff4d4d, 0 -8px 0 8px 
-        #ff4d4d, 8px 0 0 8px #ff4d4d, -8px 0 0 8px #ff4d4d;
-        margin: 20px auto;
+  box-shadow: 4px 0 #ff6666, -4px 0 #ff6666, 0 -4px #ff6666, 0 4px #ff6666, 
+  8px 0 #ff6666, -8px 0 #ff6666, 0 -8px #ff6666, 0 8px #ff6666, 0 0 0 4px #ff6666;
+  margin: 8px auto;
     }
     
     a, a:link, a:visited, a:focus, a:active
@@ -192,6 +235,7 @@
     
     header #branding h1
     {
+        
         margin:0; 
     }
     
@@ -215,7 +259,7 @@
          image-rendering: pixelated;
          margin: auto;
     }
-    
+
     .IconLink
     {   
     	float:left;  	
@@ -224,7 +268,7 @@
     header .highlight, header .current a
     {
     	color:#ffffff;
-    	font-weight:bold;
+    	 font-weight: 400; 
     }
 
     #header.container {
@@ -235,9 +279,9 @@
      #nav-open .col.s2{
         margin-top: 5px;
     }
-    #main
+    section#main
     {
-        padding:0px;
+     padding: 10px 0px 10px 0px;
     }
     /* Showcase */
     #showcase
@@ -362,15 +406,13 @@
     	float:left;
     	width: 250px;
         margin-top: 20px;
-        padding: 20px;
-        margin-left: 12px;
+      padding: 0px 0px 20px 20px;
     }
     
      aside#sidebar img
     {
-	 text-align: center;
+        text-align: center;
         width:100%;
-
     }
     
     
@@ -379,11 +421,20 @@
      {
      	float:right;
          width: 65%;
-         padding:20px;
      }
-    
-    
-    
+    article#port-main-col
+    {
+
+    }
+     article#main-col-proj
+     {
+         width: 100%;
+         height: 100%;
+     }
+    article#main-col-proj h1
+     {
+         text-align: center;
+     }
     /*Resume */
     article#main-col .page-title
     {  
@@ -394,24 +445,25 @@
     {
     	list-style:none;
     	padding: 10px;
-    	border: #cccccc solid 5px;
     	margin-bottom:1px;
-    	background:#e6e6e6;
-    	
+    	background:#ffe680;	
     }
     
     ul#collapsible
     {
-            float: left;
+        float: left;
     }
+
     ul#services  p
     {
-    	list-style:none;
-    	background:#e6e6e6;
-    	margin:0;
-    	padding:0;
+    width: auto;
+    display: inline-block;
+    background-color: #ff6666;
+   margin: 0px 5px 20px 5px;
+    font-size: 30px;
     }
     
+
     .panel-title a 
     { 
       	text-decoration:none;
@@ -427,10 +479,13 @@
     {
      cursor: pointer;  
     }
-
+    .card ul li h3
+    {
+        margin: 0px;
+    }
+    
     footer
     {
- 
         color:#ffffff;
         background-color:#ff4d4d;
         text-align: center;
@@ -441,7 +496,8 @@
         right: 0px;
         margin-bottom: 0px;
     }
-      footer p
+
+    footer p
     {
         line-height: 1px;
         margin-top: 25px;
@@ -457,13 +513,19 @@
     min-width: 700px;
     }
 
-    aside#sidebar {
+        
+    .portfolio-body
+     {
+
+         min-width: 0px;
+         float: none;
+     }
+
+    aside#sidebar 
+    {
     float: none;
     padding: 20px;
-
-    
-
-}
+    }
 }
     @media(max-width: 768px)
     {
@@ -472,13 +534,14 @@
 	header nav li,
 	#boxes .box,
 	article#main-col,
-	aside#sidebar
+    aside#sidebar,
+
 	{
 	    float:none;	
         width:100%;
-
         margin: auto;
-	}
+    }
+
      html 
     {
         height: 100%;
@@ -561,7 +624,6 @@ ul{
 .sidenav a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
-    font-size: 25px;
     color: #818181;
     display: block;
     transition: 0.3s
@@ -590,14 +652,80 @@ ul{
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) 
 {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
+    .sidenav 
+    {
+        padding-top: 15px;
+    }
+    .sidenav a 
+    {
+        font-size: 18px;
+    }
 }
 
+/* Style the tab */
+div.tab {
+    float: left;
+    background-color: #ff4d4d;
+    width: 120px;
+    height: 100%;
+}
+
+/* Style the buttons inside the tab */
+article#main-col-proj  div.tab button 
+{
+    display: block;
+    background-color: inherit;
+    color: black;
+    padding: 22px 2px;
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+article#main-col-proj div.tab button:hover 
+{
+    background-color: #80bfff;
+}
+
+/* Create an active/current "tab button" class */
+div.tab button.active 
+{
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent 
+{
+    padding:30px 0px 0px 120px;
+    border-left: none;
+    height: 100%;
+    background-color: #80bfff;
+}
     
-    
-    
-    
+ .tabcontent h3
+ {
+    margin: 0px 0px 0px 0px;
+ }    
+    a.sLinks
+    {
+        display: inline-block;
+       padding: 20px 15px;
+    }
+
+    a.sLinks img
+    {
+        width:45px;
+        image-rendering: pixelated;
+    }
+   
+    .card .card-action 
+    {
+        padding: 10px 24px 0px 5px;
+    }
     
     
     

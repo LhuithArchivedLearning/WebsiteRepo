@@ -18,59 +18,673 @@
  	 <link rel="stylesheet" href="./css/style.css">
 
  </head>
-    <body>       
-        <header>       
-        <div class ="container">
-        	<div id="branding">
-        	<a class="heading" href="index.html"><h1><span class="highlight">Gene</span> Space</h1></a>
-        	</div>
-        <nav>
-        	<ul>
-        	<div>
-        		<li><a class="divlink" href="index.html">Home</a></li>
-        		<li><a  class="divlink" href="about.html">About</a></li>    
-        		<li class="current" ><a  class="divlink" href="portfolio.html">Projects</a></li>
-        		<li><a  class="divlink" href="services.html">Services</a></li>
-        		<li><a  class="divlink" href="blog.html">Blog</a></li>
-        		
-        	<div class = "IconLink">
-        		<li>
-    		    	<a class="sLinks" href="https://twitter.com/jhonnywhiplash">
-    				<img class = "pixelated" src = "img/Icons/Logo's_twitter.png"> </img>
-    				</a>
-    			</li>
-    			<li>
-    		    	<a class="sLinks" href="https://www.linkedin.com/in/eugene-martens-7b9603a0/">
-    				<img class = "pixelated" src = "img/Icons/Logo's_linkedin.png"> </img>
-    				</a>
-    			</li>
-    			<li>
-    				<a class="sLinks" href="https://github.com/Togene">
-    				<img class = "pixelated" src = "img/Icons/Logo's_Github.png"> </img>
-    				</a>
-    			</li>
-    			</div>
-        	</div>
-        </ul>
-        </nav>             
-        </div>
-        </header>
+		<header>      
+		<div class ="container" id="header">
+		
+		<div class="row">
+			<div class="col s6">
+		<!-- Use any element to open the sidenav -->
+		<div class="col s2" id="nav-open"><span onclick="openNav()">lll</span> </div>
 
-        <section id="main">
-    		<div class="container-body">
-    	
-    		<article id= "main-col">
-    		<h1 class="page-title">Projects</h1>
+		<div class="col s10">
+			 <div id="branding">
+				<h1><a class="heading" href="index.html"><span class="highlight">Gene</span> Space </a></h1>
+		  	 </div>
+		</div> 
+	</div>
+	<div class="col s6">
+		 
+		
+		<div id="mySidenav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+		<a href="about.html">About</a>
+		<a href="services.html">Services</a>
+		<a href="portfolio.html">Portfolio</a>
+		<a href="blog.html">Blog</a>
+    
+    <div class = "IconLink">
+    <a class="sLinks" href="https://twitter.com/jhonnywhiplash">
+    <img class = "pixelated" src = "img/Icons/Logo's_twitter.png"> </img>
+    </a>
+    <a class="sLinks" href="https://www.linkedin.com/in/eugene-martens-7b9603a0/">
+    <img class = "pixelated" src = "img/Icons/Logo's_linkedin.png"> </img>
+    </a>
+    <a class="sLinks" href="https://github.com/Togene">
+    <img class = "pixelated" src = "img/Icons/Logo's_Github.png"> </img>
+    </a>
+    </div>
+        
+		</div>
+		</div>
+		</div>
+    
+    
+		</header>
+
+    		<article id= "main-col-proj">
     		
-    		<p>   		
-    		Tasty Projects Go here
-    		</p>
+
+<div class="tab">
+  <button class="tablinks" onclick="openCity(event, 'GP')" id="defaultOpen">Game Projects</button>
+  <button class="tablinks" onclick="openCity(event, 'TA')">Traditional Art</button>
+  <button class="tablinks" onclick="openCity(event, 'MnA')">Models and Animations</button>
+  <button class="tablinks" onclick="openCity(event, 'CnI')">Concept's and Illustrations</button>
+  <button class="tablinks" onclick="openCity(event, 'PA')">Pixel Art</button>
+  <button class="tablinks" onclick="openCity(event, 'TP')">Tech Projects</button>
+  <button class="tablinks" onclick="openCity(event, 'CG')">CG Projects</button>
+</div>
+
+<div id="GP" class="tabcontent">
+        <section id="port-main">
+    		<div class="portfolio-body">   	
+    		<article id= "port-main-col">
+
+  <h3>Game Projects</h3>
+  <div class="row">	
+
+      				<div class="col s4 m4">
+
+		 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Horizon</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+			 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Horizon</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+					</div>
+
+					<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>BeCalm</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+		
+				<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>BeCalm</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+
+		<div class="col s4 m4">
+					
+
+		  <div class="card" id="SaIT">
+					<div class="card-image">
+					<h3>Lights Out</h3>
+					</div>
+					<div class="card-content">
+      			 			 		<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+
+		  </div>
+		
+		  				<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>BeCalm</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+      </div>
+
+		  </article>
+  		</div> 	  		
+		</section> 
+</div>
+
+<div id="TA" class="tabcontent">
+          <section id="port-main">
+    		<div class="portfolio-body">   	
+    		<article id= "port-main-col">
+  <h3>Traditional Art</h3>
+    <div class="row">	
+
+      				<div class="col s4 m4">
+
+		 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Software and IT</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+		
+					</div>
+
+					<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Art and Design</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+
+					<div class="col s4 m4">
+						
+		<div class="card" id="SaIT">
+					<div class="card-image">
+					<h3>Animation and Modelling</h3>
+					</div>
+					<div class="card-content">
+      			 			 		<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+          </div>
+      </div>
+
+
+  		  </article>
+  		</div> 	  		
+		</section> 
+</div>
+
+<div id="MnA" class="tabcontent">
+             <section id="port-main">
+    		<div class="portfolio-body">   	
+    		<article id= "port-main-col">
+
+  <h3>Models and Animations</h3>
+    <div class="row">	
+
+      				<div class="col s4 m4">
+
+		 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Software and IT</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+		
+					</div>
+
+					<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Art and Design</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+
+					<div class="col s4 m4">
+						
+		<div class="card" id="SaIT">
+					<div class="card-image">
+					<h3>Animation and Modelling</h3>
+					</div>
+					<div class="card-content">
+      			 			 		<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+          </div>
+      </div>
+
+
+  		  </article>
+  		</div> 	  		
+		</section> 
+</div>
+
+<div id="CnI" class="tabcontent">
+              <section id="port-main">
+    		<div class="portfolio-body">   	
+    		<article id= "port-main-col">
+
+  <h3>Concept's and Illustrations</h3>
+    <div class="row">	
+
+      				<div class="col s4 m4">
+
+		 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Software and IT</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+		
+					</div>
+
+					<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Art and Design</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+
+					<div class="col s4 m4">
+						
+		<div class="card" id="SaIT">
+					<div class="card-image">
+					<h3>Animation and Modelling</h3>
+					</div>
+					<div class="card-content">
+      			 			 		<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+          </div>
+      </div>
+
+
+  		  </article>
+  		</div> 	  		
+		</section> 
+</div>
+
+<div id="PA" class="tabcontent">
+               <section id="port-main">
+    		<div class="portfolio-body">   	
+    		<article id= "port-main-col">
+
+  <h3>Pixel Art</h3>
+    <div class="row">	
+
+      				<div class="col s4 m4">
+
+		 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Software and IT</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+		
+					</div>
+
+					<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Art and Design</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+
+					<div class="col s4 m4">
+						
+		<div class="card" id="SaIT">
+					<div class="card-image">
+					<h3>Animation and Modelling</h3>
+					</div>
+					<div class="card-content">
+      			 			 		<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+          </div>
+      </div>
+
+
+  		  </article>
+  		</div> 	  		
+		</section> 
+</div>
+
+<div id="TP" class="tabcontent">
+           <section id="port-main">
+    		<div class="portfolio-body">   	
+    		<article id= "port-main-col">
+
+  <h3>Tech Projects</h3>
+    <div class="row">	
+
+      				<div class="col s4 m4">
+
+		 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Software and IT</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+		
+					</div>
+
+					<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Art and Design</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+
+					<div class="col s4 m4">
+						
+		<div class="card" id="SaIT">
+					<div class="card-image">
+					<h3>Animation and Modelling</h3>
+					</div>
+					<div class="card-content">
+      			 			 		<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+          </div>
+      </div>
+
+
+  		  </article>
+  		</div> 	  		
+		</section> 
+</div>
+
+<div id="CG" class="tabcontent">
+             <section id="port-main">
+    		<div class="portfolio-body">   	
+    		<article id= "port-main-col">
+
+  <h3>CG Projects</h3>
+    <div class="row">	
+
+      				<div class="col s4 m4">
+
+		 <div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Software and IT</h3>
+					</div>
+					<div class="card-content">
+					<ul>
+    					<li>  		 	
+								<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+    					</li>
+  				</ul>
+			
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+		
+					</div>
+
+					<div class="col s4 m4">
+						
+					<div class="card" id="SaIT" >
+					<div class="card-image">
+					<h3>Art and Design</h3>
+					</div>
+					<div class="card-content">
+						<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>					
+					</div>
+
+					<div class="col s4 m4">
+						
+		<div class="card" id="SaIT">
+					<div class="card-image">
+					<h3>Animation and Modelling</h3>
+					</div>
+					<div class="card-content">
+      			 			 		<ul id="services">
+      			 				<li>	
+      			 			 	</li>
+      			 			 		</ul>
+					</div>
+					<div class="card-action">
+					<a href="#">This is a link</a>
+					</div>
+		  </div>
+          </div>
+      </div>
+
+
+  		  </article>
+  		</div> 	  		
+		</section> 
+</div>
+
+<script>
+function openCity(evt, cityName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+</script>
     		
     		</article>
-    		
-    		
-	</section>
+    	
+<script>
+		function openNav() 
+		{
+			document.getElementById("mySidenav").style.width = "250px";
+		}
 
+		function closeNav() 
+		{
+			document.getElementById("mySidenav").style.width = "0";
+		}
+</script>
 
     	    
         <footer>

@@ -3,7 +3,7 @@
     {
         var map = new Array();
 
-        var a = parseFloat(3);
+        var a = parseFloat(1);
         var b = parseFloat(5.2);
 
         for(var i = 0; i < size; i++)

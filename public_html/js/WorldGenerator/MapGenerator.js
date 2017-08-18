@@ -5,7 +5,8 @@
         var falloffMap = GenerateFalloffMap(size);
         var colorMap = new Array();
         var clampedMap = new Array();
-
+        var regions = regionRoll();
+        
         for(var x = 0; x < size; x++)
          {
               clampedMap[x] = new Array();

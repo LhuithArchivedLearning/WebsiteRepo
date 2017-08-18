@@ -92,23 +92,3 @@
 
         return  noiseMap;
     }
-
-    function randomRange(min, max)
-    {
-        return min + Math.random() * (max - min);
-    };
-
-    function frac(f) 
-    {
-    return f % 1;
-    };
-
-    function Normalize(min, max, value)
-    {     
-         return (value - min) / (max - min);
-    };
-
-    function Clamp (value, min, max) 
-    {
-    return Math.min(Math.max(value, min), max);
-    };
