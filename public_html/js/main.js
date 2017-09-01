@@ -1,15 +1,11 @@
    
-	var container, stats, resolution, map;
-    var camera, scene, renderer, clock, planet, moon;
-    var moonList;
-    var inPlanet, gui;
-    var planetSize, outline, selected, planetText;
+	var container, stats, resolution, map, controls, lineUI, gui;
+    var camera, MainScene, BackgroundScene, renderer, clock, composer;
     var lightpos, dirLight, angle;
-    var x,y,z, controls, square, lineUI, PlanetMaterial;
-    var   textlabels = new Array();
+
     // Custom global variables
     var mouse = {x: 0, y: 0};
-
+    var resolution = 3;
     var octaves; 
     var persistance; 
     var lacunarity; 
@@ -19,310 +15,159 @@
     var textureSize = 256;
     var mouseDown = false;
     var boxsize = 25;
+    var planetSize, inPlanet, planet, planetText, atmoMaterial, planetTilt, hasRings, 
+    PlanetMaterial, moonList, ringsList, outline, atmo, clouds, planetGeo, planetRotationPeriod;
+    var ShaderDataInfo = {vs:'', fs : ''};
+    var skyboxuniforms;
 
-    var firstLetter = "UYEEOOOOOOOIIIIIIIIAAAAAAAAAAAAKJVRRGGNNPPDDDLLLCCCCFFFFMMMMMBBBBBWWWWWWWHHHHHHHHSSSSSSSSTTTTTTTTTTTTTTTTT"; // Most words(17%) start with T. Few start with K. Multiples of the same letter increases the odds of being chosen. 
-    var cDiagraphs = "thhereedndhantledertvetito"; // letter pairs
-    var vDiagraphs = "anineronatenesofeaioisouaras"; // letter pairs
-    var endL = "estdnryfloghakmpuw";
-    var cons = "ttttttttttnnnnnnnnsssssshhhhhhrrrrrdddddllllcccmmmwfffggyppbbvkjxz";
-    var vowel = "eeeeeeeeeeeeeeaaaaaaaaooooooooiiiiiiiuuuy"; // Y is sometimes a vowel
-                
-	init();
-    animate();
+    var startTime = Date.now();
     
-    //Credit : https://codepen.io/brandonisgreen/pen/Khibx?editors=0010
-    function word(len)
-  {
-				var theword = "";
-				while(theword.length < (len)){ // word length
-            if (theword.length === 0){ 
-              var fLetterPos = (Math.random())*vowel.length;
-                theword = theword + firstLetter.substr(fLetterPos,1);
-              if (fLetterPos > 31){
-                theword = theword+vowel.substr((Math.random())*vowel.length,1);
-              }
-            }//end first letter
-            // Get a diagraph
-            var llet = theword.substr(theword.length-1,1);
-            // if word is good 'as-is'
-            if(theword.length > 4){
-            if ( goodEnd(llet) == true){
-                  theword = theword+endL.substr((Math.random())*endL.length,1);//extra spaces to stop the loop(which goes by word length)
-                  
-                  break;
-            }
-            }
-            var getDG = Math.floor(Math.random()*20);
-            var newRan = Math.floor(Math.random()*5);
-            // Use diagraph if vowel
-            if (getDG > 15){
-                //get last letter
-                var llet = theword.substr(theword.length-1,1);
-                if (isVowel(llet) == true){
-                  theword = theword + cDiagraphs.substr(Math.floor(Math.random() * (cDiagraphs.length /2))*2, 2);
-                }
-              // roll a dice for diagraphs first letter (vowel vs const)
-              var d3 = Math.floor(Math.random() * 3);
-              if (d3 == 1){
-                theword = theword + cDiagraphs.substr(Math.floor(Math.random() * (cDiagraphs.length /2))*2, 2);
-              }
-              else{
-                theword = theword + vDiagraphs.substr(Math.floor(Math.random() * (vDiagraphs.length /2))*2, 2);
-              }
-            }
-            if(newRan < 1){ // odds of vowel
-                
-                theword = theword+vowel.substr((Math.random())*vowel.length,1);
-              } else {
-					
-					theword = theword +cons.substr((Math.random())*cons.length,1);
-             }
-				}
-        
-				return theword;
-        }
-  
-function goodEnd (letter)
- {
-    var chars = ["e", "s", "t", "d", "n", "r", "y", "f", "l", "o", "g", "h", "a", "k", "m", "p", "u", "w"];
-    for(var i = 0; i < chars.length; i++){
-        if(letter === chars[i]){
-            return true;
-         }
-    }
-    return false;
-};
+    init();
+    animate();
 
-function isVowel (letter) {
-    var vowels = ["a","e","i","o","u"];
-    for(var i = 0; i < vowels.length; i++){
-        if(letter === vowels[i]){
-            return true;
-         }
+    //Yummy Yum Yum
+    function textParse(glsl, shadow_text, dither_text) 
+    { 
+        var text = glsl.replace("AddShadow", shadow_text);
+        text = text.replace("AddDither", dither_text);
+
+        return text;
     }
-    return false;
-};
 
     function init()
     {    
-        CalculateParametres();
+        MainScene = new THREE.Scene();
+        BackgroundScene = new THREE.Scene();
 
-        resolution = 3;
-        clock = new THREE.Clock();
-
-
-        var map = new MapGenerator(octaves, persistance, lacunarity, 
-            seed, noiseScale, offset, textureSize);
-
-        const dataTexture = new THREE.DataTexture
-        (
-        Uint8Array.from(map),
-        textureSize,
-        textureSize,
-        THREE.RGBFormat,
-        THREE.UnsignedByteType,
-        );
-
-        dataTexture.needsUpdate = true;
-
-        const dataMaterial = new THREE.MeshBasicMaterial({
-        transparent: false,
-        map: dataTexture
-        });
-        dataMaterial.needsUpdate = true;
-
-        container = document.getElementById( 'webGL-container' );
-        document.body.appendChild( container );
-
-        var width = window.innerWidth;
-        var height = window.innerHeight;
-                
-        //Creates empty scene object and renderers
-
-        camera = new THREE.OrthographicCamera( width / - 2, width / 2, 
-                                height / 2, height / - 2, - 500, 1000 );
+        camera = new THREE.OrthographicCamera(  window.innerWidth / - 2,  window.innerWidth / 2, 
+                                                window.innerHeight /  2,  window.innerHeight / - 2, - 500, 1000 );
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = 200;
-
-        scene = new THREE.Scene();
-        
-        dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight.position.set(50, 25, 50);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        createPlanet(true);
-
-        var square = new THREE.Geometry();
-        square.vertices.push(new THREE.Vector3(0, 0, 0));
-        square.vertices.push(new THREE.Vector3(0, boxsize, 0));
-        square.vertices.push(new THREE.Vector3(boxsize, boxsize, 0));
-        square.vertices.push(new THREE.Vector3(boxsize, 0, 0));
-
-        square.vertices.push(new THREE.Vector3(0, 0, 0));
-
-        square.faces.push(new THREE.Face3(0, 1, 2));
-        square.faces.push(new THREE.Face3(0, 3, 2));
-
-        lineUI = new THREE.Line(square, new THREE.LineDashedMaterial({
-	    color: 0xfff000,
-	    dashSize: 2,
-	    gapSize: 5,
-	    linewidth: 1
-      }));
-
-        lineUI.position.set(250,-200,0);
-        scene.add(lineUI);
+        camera.position.z = 300;
+     
+        container = document.getElementById( 'webGL-container' );
+        document.body.appendChild( container );
 
         renderer = new THREE.WebGLRenderer({ antialias: false });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize( window.innerWidth / resolution, window.innerHeight / resolution );
         renderer.setClearColor( 0x000000, 1);
         renderer.domElement.id = "Poo Poo";
-
-
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMapSoft = true;
-
-        renderer.shadowCameraNear = 3;
-        renderer.shadowCameraFar = camera.far;
-        renderer.shadowCameraFov = 50;
-
-        renderer.shadowMapBias = 0.0039;
-        renderer.shadowMapDarkness = 0.5;
-        renderer.shadowMapWidth = 1024;
-        renderer.shadowMapHeight = 1024;
-
-
         container.appendChild( renderer.domElement );               
-        
+        renderer.autoClear = false;
         renderer.domElement.style.width = renderer.domElement.width * resolution + 'px';
         renderer.domElement.style.height = renderer.domElement.height * resolution + 'px';
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMapSoft = false;
+        renderer.shadowMapSize = 32;
+        renderer.shadowMap.renderReverseSided = false;
+        renderer.shadowMap.renderSingleSided = false;
+
+        clock = new THREE.Clock();
+    
+
+        //Load Shaders and Setup Planet
+        ShaderLoader('js/Shaders/DitherLight/DitherLightShader.vs.glsl', 
+        'js/Shaders/DitherLight/DitherLightShader.fs.glsl', setUpPlanet, true); 
+        
+        //Load Shaders and Setup SkyBox
+        ShaderLoader('js/Shaders/Skybox/SkyBox.vs.glsl', 
+                     'js/Shaders/Skybox/SkyBox.fs.glsl', setUpSky, true); 
+
+
+        lineUI = CreateUI(new THREE.Vector3(250,-200,0));
+
+        MainScene.add(lineUI);
 
         //Add Controls
-        //controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
         //controls.minZoom = 0.5;
        // controls.maxZoom = 1.5;
 
+        
+        dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        var vector = new THREE.Vector3(1000,1000,750);
+        dirLight.position.set(vector);
+
+        dirLight.shadow.camera.near	= 0.01;		
+        dirLight.castShadow = true;
+
+        var d = 550;
+
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+
+        dirLight.shadow.mapSize.width = 512;
+        dirLight.shadow.mapSize.height = 512;
+
+        dirLight.shadow.camera.far = 1500;
+        dirLight.shadow.bias = -0.01;
+  
+        var shadowCam = new THREE.CameraHelper( dirLight.shadow.camera );
+        //MainScene.add(shadowCam);
+        MainScene.add(dirLight);
+
+        //Composer
+        composer = new THREE.EffectComposer(renderer);
+        //Passes
+
+        var StarsRenderPass = new THREE.RenderPass(BackgroundScene, camera);
+        composer.addPass(StarsRenderPass);    
+
+        var bloomPass = new THREE.BloomPass(3, 25, 5, 128);
+        composer.addPass(bloomPass)
+
+        var effectCopy = new THREE.ShaderPass(THREE.CopyShader);
+        composer.addPass(effectCopy);
+        effectCopy.renderToScreen = true;
+
+        var MainRenderPass = new THREE.RenderPass(MainScene, camera);
+        MainRenderPass.clear = false;
+        MainRenderPass.clearDepth = true;
+        composer.addPass(MainRenderPass);
+
+        MainRenderPass.renderToScreen = true;
+
         //controls.addEventListener("change", render);
         var gridHelper = new THREE.GridHelper( 1000, 20 );
-        //scene.add( gridHelper );
+        //MainScene.add( gridHelper );
         
         var axisHelper = new THREE.AxisHelper( 5 );
-        //scene.add( axisHelper )
+        //MainScene.add( axisHelper )
 
-         moonAxis = new THREE.Vector3(0,1,0);//tilted a bit on x and y
-    
-        // When the mouse moves, call the given function
         document.addEventListener('mousemove', onMouseMove, false);
         document.addEventListener('mousedown', MouseDown, true);
-        document.addEventListener('mouseup', function (e) {
-        onMouseUp(e);
-    }, false);
-
+        document.addEventListener('mouseup', function (e) { onMouseUp(e); }, false);
         window.addEventListener("resize", onWindowResize, false);
+     
+        //var geometry = new THREE.PlaneGeometry( 1225, 1120, 32 );
+        //var material = new THREE.MeshLambertMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+        //var plane = new THREE.Mesh( geometry, material );
+        //MainScene.add( plane );
+        //plane.receiveShadow = true;
+        //plane.castShadow = true;
 
-        
         controls = new function() 
         {
-        this.xPos = 0;
-        this.yPos = 0;
-        this.zPos = 0;
-
-        this.xRot = 0;
-        this.yRot = 0;
-        this.zRot = 0;
-
+        this.xPos = vector.x;
+        this.yPos = vector.y;
+        this.zPos = vector.z;
         }
 
         gui = new dat.GUI();
-        gui.add(controls, 'xPos', -200, 200);
-        gui.add(controls, 'yPos', -200, 200);
-        gui.add(controls, 'zPos', -200, 200);
+        gui.add(controls, 'xPos', -1000, 1000);
+        gui.add(controls, 'yPos', -1000, 1000);
+        gui.add(controls, 'zPos', -1000, 1000);
 
-        gui.add(controls, 'xRot', -1, 1);
-        gui.add(controls, 'yRot', -1, 1);
-        gui.add(controls, 'zRot', -1, 1);
+        var col = new THREE.Vector3(255,255,255);
+        col = shadeRGBColor(col, -.5);
 
-        dat.GUI.toggleHide();
-
-         var geometry = new THREE.CylinderGeometry(0, 10, 30, 4, 1);
-
-        for (var i = 0; i < 5; i++) 
-    {
-        var material = new THREE.MeshBasicMaterial({
-          color: 0xffffff
-        });
-
-        var object = new THREE.Object3D();
-        object.position.x = (Math.random() - 0.5) * 1000;
-        object.position.y = (Math.random() - 0.5) * 1000;
-        object.position.z = (Math.random() - 0.5) * 1000;
-        object.updateMatrix();
-        object.matrixAutoUpdate = false;
-        scene.add(object);
+        var hexCol = "#ffffff";
+        hexCol = shadeHEXColor(hexCol.toString(), -0.5);
+        console.log(hexCol)
     }
-
-    }
-
-    https://codepen.io/brandonisgreen/pen/Khibx
-
-
-    function createTextLabel() 
-    {
-
-    var div = document.createElement('div');
-    div.className = 'text-label';
-    div.style.position = 'absolute';
-    div.style.width = 100;
-    div.style.color = "#ffffff";
-    div.style.height = 100;
-    div.innerHTML = "hi there!";
-    div.style.top = -1000;
-    div.style.left = -1000;
-    div.style.fontSize = "50px";
-    var _this = this;
-    
-    return {
-      element: div,
-      parent: false,
-      position: new THREE.Vector3(0,0,0),
-      setHTML: function(html)
-       {
-        this.element.innerHTML = html;
-      },
-      setParent: function(threejsobj) {
-        this.parent = threejsobj;
-      },
-      updatePosition: function(size, isPlanet) {
-        if(parent) 
-        {
-            if(isPlanet)
-                {
-           this.position.x = this.parent.position.x - this.element.clientWidth/2;
-           this.position.y = this.parent.position.y + size + 55;
-                }
-        else
-            {
-            this.position.x = this.parent.position.x;
-           this.position.y = this.parent.position.y + size + 25;  
-            }
-        
-          //this.position.copy(this.parent.position);
-        }       
-        var coords2d = this.get2DCoords(this.position, _this.camera);
-        this.element.style.left = coords2d.x + 'px';
-        this.element.style.top = coords2d.y + 'px';
-      },
-      get2DCoords: function(position, camera) {
-        var vector = position.project(camera);
-        vector.x = (vector.x + 1)/2 * window.innerWidth;
-        vector.y = -(vector.y - 1)/2 * window.innerHeight;
-        return vector;
-      }
-    };
-  }
 
     function onWindowResize()
     {	
@@ -335,16 +180,44 @@ function isVowel (letter) {
         camera.updateProjectionMatrix();
 
         renderer.setSize( window.innerWidth / resolution, window.innerHeight / resolution );
-
+        composer.setSize(window.innerWidth / resolution, window.innerHeight / resolution);
         renderer.domElement.style.width = renderer.domElement.width * resolution + 'px';
         renderer.domElement.style.height = renderer.domElement.height * resolution + 'px';
     }
 			
     function animate()
     {
-         angle += 0.01;
-        dirLight.position.set (550, 475, 650);
-        PlanetMaterial.uniforms.lightpos.value.copy (dirLight.position);
+        var delta = clock.getDelta(); 
+
+        angle += 0.01;
+        dirLight.position.set(controls.xPos, controls.yPos, controls.zPos);
+
+        if(planet !== undefined)
+        {
+            var elapsedMilliseconds = Date.now() - startTime;
+            var elapsedSeconds = elapsedMilliseconds / 1000.;
+
+            if( skyboxuniforms !== undefined)
+            skyboxuniforms.time.value = 60. * elapsedSeconds;
+            
+            PlanetRotation(planet, planetRotationPeriod, planetTilt, delta);
+            planetText.updatePosition(planetSize, true);
+            MoonsUpdate(clock.getDelta());
+            
+                if(clouds !== undefined)
+            PlanetRotation(clouds, planetRotationPeriod*4, planetTilt, delta);;
+        }
+        requestAnimationFrame(animate);
+
+        //ShowHideOutline();
+        HandleCursor();
+        input();
+        render();
+    }
+
+
+    function HandleCursor()
+    {
         if (inPlanet) 
         {
         $('html,body').css('cursor', 'pointer');
@@ -353,34 +226,40 @@ function isVowel (letter) {
         {
         $('html,body').css('cursor', 'default');
         }
-        requestAnimationFrame(animate);
+    }
 
-        var delta = clock.getDelta(); 
-        var curtime;
-        curtime += delta;
-
-        planet.rotation.y += 0.002;
-
-        //ShowHideOutline();
-
-        var axis = new THREE.Vector3(0.5,0.5,0);
-
-        input();
-        planetText.updatePosition(planetSize, true);
-
+    function MoonsUpdate(delta)
+    {  
+        
+        //Gana need to Optomize this because thats alot of shit to iterate
+        if(hasRings)
+            {
+                if (ringsList !== undefined)
+                {
+                    for(var i = 0; i < ringsList.length; i++)
+                    {
+                        RingOrbit(ringsList[i], ringsList[i].Ring, planet, 
+                        clock.getElapsedTime(), 1000, 24, delta * 42); 
+                    
+                    }
+                }
+            }
+        
         if(moonList.length != 0)
         {
             for(var i = 0; i < moonList.length; i++)
-            {
-              moonList[i].text.updatePosition(moonList[i].moonSize);
-              orbit(moonList[i], moonList[i].moonObject, 
-                planet, clock.getElapsedTime() * moonList[i].orbitSpeedMult, 
-                1000, delta/12);
-               ShowHideOrbitPath(moonList[i], moonList[i].moonOrbit);             
+            { 
+                if (moonList[i] !== undefined)
+                {                       
+                    moonList[i].text.updatePosition(moonList[i].moonSize);
+                    orbit(moonList[i], moonList[i].moonObject, 
+                    planet, clock.getElapsedTime() * moonList[i].orbitSpeedMult, 
+                    1000, delta/12);
+                    moonList[i].material.uniforms.lightpos.value.copy (dirLight.position);
+                    ShowHideOrbitPath(moonList[i], moonList[i].moonOrbit);                      
+                }       
             }
         }
-            
-        render();
     }
 
     function ShowHideOutline()
@@ -413,7 +292,8 @@ function isVowel (letter) {
             {
                 moon.text.element.style.visibility = "visible";  
 
-            orbit.traverse ( function (child) {
+            orbit.traverse ( function (child) 
+            {
         if (child instanceof THREE.Line) 
             {
             child.visible = true;
@@ -440,57 +320,19 @@ function isVowel (letter) {
     {
         //MouseInPlanet(planet.position, planetSize);
         MouseInSquare();
-        for(var i = 0; i < moonList.length; i++)
+
+        if(moonList !== undefined)
         {
-            MouseInMoon(moonList[i].moonObject, moonList[i].moonSize + 5, moonList[i]);
+            for(var i = 0; i < moonList.length; i++)
+            {
+                MouseInMoon(moonList[i].moonObject, moonList[i].moonSize + 5, moonList[i]);
+            }
         }
-    }
-    //Credit to https://doc.qt.io/qt-5/qtcanvas3d-threejs-planets-planets-js.html
-    //very smexy!
-    function orbit(planet, object, centre, currTimeD, auScale , deltaTimeD)
-    {
-        // Calculate the planet orbital elements from the current time in days
-        var N =  (planet["N1"] + planet["N2"] * currTimeD) * Math.PI / 180;
-        var iPlanet = (planet["i1"] + planet["i2"] * currTimeD) * Math.PI / 180;
-        var w =  (planet["w1"] + planet["w2"] * currTimeD) * Math.PI / 180;
-        var a = planet["a1"] + planet["a2"] * currTimeD;
-        var e = planet["e1"] + planet["e2"] * currTimeD;
-        var M = (planet["M1"] + planet["M2"] * currTimeD) * Math.PI / 180;
-        var E = M + e * Math.sin(M) * (1.0 + e * Math.cos(M));
-
-        var xv = a * (Math.cos(E) - e);
-        var yv = a * (Math.sqrt(1.0 - e * e) * Math.sin(E));
-        var v = Math.atan2(yv, xv);
-
-        // Calculate the distance (radius)
-        var r = Math.sqrt(xv * xv + yv * yv);
-
-        // From http://www.davidcolarusso.com/astro/
-        // Modified to compensate for the right handed coordinate system of OpenGL
-        var xh = r * (Math.cos(N) * Math.cos(v + w)
-                      - Math.sin(N) * Math.sin(v + w) * Math.cos(iPlanet));
-        var zh = -r * (Math.sin(N) * Math.cos(v + w)
-                       + Math.cos(N) * Math.sin(v + w) * Math.cos(iPlanet));
-        var yh = r * (Math.sin(w + v) * Math.sin(iPlanet));
-
-        // Apply the position offset from the center of orbit to the bodies
-        var centerOfOrbit = centre;//objects[planet["centerOfOrbit"]];
-        object.position.set(centerOfOrbit.position.x + xh * auScale,
-                            centerOfOrbit.position.y + yh * auScale,
-                            centerOfOrbit.position.z + zh * auScale);
-
-        // Calculate and apply the appropriate axis tilt to the bodies
-        // and rotate them around the axis
-        var radians = planet["tilt"] * Math.PI / 180; // tilt in radians
-        object.rotation.order = 'ZXY';
-        object.rotation.x = 0;
-        object.rotation.y += (deltaTimeD / planet["period"]) * 2 * Math.PI;
-        object.rotation.z = radians;
     }
 
     function render()
     {
-         renderer.render( scene, camera );
+         composer.render();
     }
 
     function MouseInPlanet(object, rad)
@@ -600,7 +442,7 @@ function isVowel (letter) {
         
     };       
 
-      function onMouseUp(evt)
+    function onMouseUp(evt)
     {
         evt.preventDefault();
 
@@ -608,7 +450,7 @@ function isVowel (letter) {
     }
 
     function MouseDown (event)
-     {
+    {
         event.preventDefault();   
                   
         if (inPlanet) 
@@ -616,7 +458,8 @@ function isVowel (letter) {
             switch ( event.button ) 
             {
             case 0: // left
-                createPlanet(false);
+                ShaderLoader('js/Shaders/DitherLight/DitherLightShader.vs.glsl', 
+                'js/Shaders/DitherLight/DitherLightShader.fs.glsl', setUpPlanet, false); 
                 break;
             case 1: // middle
                 break;
@@ -629,356 +472,570 @@ function isVowel (letter) {
 
     };
 
-    function replaceThreeChunkFn(a, b) {
-    return THREE.ShaderChunk[b] + '\n';
-}
-
-function shaderParse(glsl) {
-    return glsl.replace(/\/\/\s?chunk\(\s?(\w+)\s?\);/g, replaceThreeChunkFn);
-}
-
-    function CalculateParametres()
+    function CalculateParametres(vertex_text, fragment_text)
     {
         persistance = randomRange(0.65, 0.85);
         lacunarity = randomRange(1.9, 2.2);
         octaves = Math.round(randomRange(4,6));
         noiseScale = randomRange(10, 200);
         planetSize = randomRange(40, 125);
-        moonList = new Array(Math.round(randomRange(1, 4)));     
+        moonList = new Array(Math.round(randomRange(1, 4)));
+        planetTilt = randomRange(-55, 55);
+        planetRotationPeriod = Math.round(randomRange(65, 100));
+     
+        InitializeMoonData(moonList, vertex_text, fragment_text);
+    }
 
-    // Planet Data
-    // radius - planet radius in millions of meters
-    // tilt - planet axis angle
-    // N1 N2 - longitude of the ascending node
-    // i1 i2 - inclination to the ecliptic (plane of the Earth's orbit)
-    // w1 w2 - argument of perihelion
-    // a1 a2 - semi-major axis, or mean distance from Sun
-    // e1 e2 - eccentricity (0=circle, 0-1=ellipse, 1=parabola)
-    // M1 M2 - mean anomaly (0 at perihelion; increases uniformly with time)
-    // period - sidereal rotation period
-    // centerOfOrbit - the planet in the center of the orbit
-    // (orbital elements based on http://www.stjarnhimlen.se/comp/ppcomp.html)
-    //Creates empty scene object and renderers
-    //i1: 115.1454
+    function setUpRings(start, vertex_text, fragment_text)
+    {
+        ringsList = new Array(Math.round(randomRange(1,5)));
 
-     for(var i = 0; i < moonList.length; i++)
-        {
-
-        var roll = randomRange(0,10);
+        InitializeRingsData(ringsList); 
         
-        var mat;
-        size =  randomRange(5, Math.round(planetSize/3));
-
-        if(roll > 2.2)
+        if (ringsList !== undefined)
+        {
+            for(var i = 0; i < ringsList.length; i++)
             {
-                var map = new MapGenerator(octaves, persistance, lacunarity, 
-                seed, 128, offset, 24);
+                    if(!ringsList[i].isFlat)
+                    {
+                        CreateRockyBelt(ringsList[i], planet,clock.getElapsedTime(), 
+                                                    1000, ringsList[i].NumAstros, ringsList[i].Ring, 
+                                                    vertex_text, fragment_text, dirLight.position, 
+                                                    ringsList[i].astoList);   
+                    }
+                    else
+                    {
+                        ShaderLoader('js/Shaders/Ring/Ring.vs.glsl', 
+                        'js/Shaders/Ring/Ring.fs.glsl', SetUpFlatBelt, {data: ringsList[i], scene : MainScene}); 
+                    }
 
-                const dataTexture = new THREE.DataTexture
-                (
-                Uint8Array.from(map),
-                24,
-                24,
-                THREE.RGBFormat,
-                THREE.UnsignedByteType,
-                );
-
-                dataTexture.needsUpdate = true;
-                
-
-                var uniforms = {
-             indexMatrix4x4:{ type: "fv1" , value: [0,  32, 8,  40, 2,  34, 10, 42,
-                                     48, 16, 56, 24, 50, 18, 58, 26,
-                                     12, 44, 4,  36, 14, 46, 6,  38,
-                                     60, 28, 52, 20, 62, 30, 54, 22,
-                                     3,  35, 11, 43, 1,  33, 9,  41,
-                                     51, 19, 59, 27, 49, 17, 57, 25,
-                                     15, 47, 7,  39, 13, 45, 5,  37,
-                                     63, 31, 55, 23, 61, 29, 53, 21]},
-
-                palette:{type:"v3v", value:[new THREE.Vector3( 0.0, 0.0, 0.0 ),
-                                            new THREE.Vector3( .14, .14, .14 ),
-                                            new THREE.Vector3( .28, .28, .28 ),
-                                            new THREE.Vector3( .43, .43, .43 ),
-                                            new THREE.Vector3( .57, .57, .57 ),
-                                            new THREE.Vector3( .71, .71, .71 ),
-                                            new THREE.Vector3( .85, .85, .85 ),
-                                            new THREE.Vector3( .9, .9, .9)]},
-                paletteSize:{type:"i", value:8},
-               texture: { type: "t", value: dataTexture },
-               lightpos: {type: 'v3', value: new THREE.Vector3(0,30,20) },
-                  noTexture:{type:"i", value:0}
-        };
-
-         moonMaterial = new THREE.ShaderMaterial({
-             uniforms: uniforms,
-            vertexShader: $("#vertexshader").text(),
-            fragmentShader: $("#fragmentshader").text()
-        });
-
-                const dataMaterial = new THREE.MeshBasicMaterial({
-                transparent: false,
-                map: dataTexture
-                });
-                dataMaterial.needsUpdate = true;
-                mat = moonMaterial;
+                    MainScene.add(ringsList[i].Ring);      
             }
+        }
+        
+    }
+
+
+    function CreateFlatBelt(ringData, vertex_text, fragment_text)
+    {
+      
+        var ringGeo = new RingGeoCreate(ringData,  ringData.Ring, 1000);
+    
+            var uniform =
+            {
+                    color: { type: "vf3", value: new THREE.Vector3(1,1,1)},
+                    side: THREE.DoubleSide,
+                    indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
+                    palette:{type:"v3v", value: GrayScalePallete},
+                    paletteSize:{type:"i", value:8},
+            };
+    
+           // console.log(THREE.UniformsLib['lights']);
+    
+            ringMaterial = new THREE.ShaderMaterial
+            ({
+            uniforms: THREE.UniformsUtils.merge([
+                THREE.UniformsLib['lights'], uniform ]),
+            vertexShader: textParse(vertex_text),
+            fragmentShader: textParse(fragment_text),
+            lights: true,
+            transparent : true
+            });
+            ringMaterial.side = THREE.DoubleSide;
+
+        var newRing = new THREE.Mesh( ringGeo, ringMaterial );
+
+        ringData.Ring.add(newRing);
+    }
+
+    function InitializeRingsData(ringsList)
+    {
+        for(var i = 0; i < ringsList.length; i++)
+        {
+            var orbitrangeOutter;
+            var orbitrangeInner;
+            var orbitspeed;
+            var flat;
+            var per;
+
+            var roll = Math.round(randomRange(0, 10));
+            
+            if(roll >= 4)
+            flat = false;
             else
-            { 
+            flat = true;
 
-                  var uniforms = {
-             indexMatrix4x4:{ type: "fv1" , value: [0,  32, 8,  40, 2,  34, 10, 42,
-                                     48, 16, 56, 24, 50, 18, 58, 26,
-                                     12, 44, 4,  36, 14, 46, 6,  38,
-                                     60, 28, 52, 20, 62, 30, 54, 22,
-                                     3,  35, 11, 43, 1,  33, 9,  41,
-                                     51, 19, 59, 27, 49, 17, 57, 25,
-                                     15, 47, 7,  39, 13, 45, 5,  37,
-                                     63, 31, 55, 23, 61, 29, 53, 21]},
 
-                palette:{type:"v3v", value:[new THREE.Vector3( 0.0, 0.0, 0.0 ),
-                                            new THREE.Vector3( .14, .14, .14 ),
-                                            new THREE.Vector3( .28, .28, .28 ),
-                                            new THREE.Vector3( .43, .43, .43 ),
-                                            new THREE.Vector3( .57, .57, .57 ),
-                                            new THREE.Vector3( .71, .71, .71 ),
-                                            new THREE.Vector3( .85, .85, .85 ),
-                                            new THREE.Vector3( .9, .9, .9)]},
-                paletteSize:{type:"i", value:8},
-               texture: { type: "t", value: null },
-               lightpos: {type: 'v3', value: new THREE.Vector3(0,30,20) },
-               noTexture:{type:"i", value:1}
-        };
 
-         moonMaterial = new THREE.ShaderMaterial({
-             uniforms: uniforms,
-            vertexShader: $("#vertexshader").text(),
-            fragmentShader: $("#fragmentshader").text()
-        });
-
-                mat = moonMaterial;
+            if(i == 0)
+            {
+                        orbitrangeInner = randomRange((planetSize/1000) * 1.1, (planetSize/1000) * 1.2);
+                        orbitrangeOutter = randomRange(orbitrangeInner * 1.1, orbitrangeInner * 1.2);
+            }
+            else if(i > 1)
+            {
+                    orbitrangeInner = randomRange((ringsList[i - 1].a1), (ringsList[i - 1].a1) * 1.15);
+                    orbitrangeOutter = randomRange(orbitrangeInner * 1.1, orbitrangeInner * 1.11);
             }
 
-            moonList[i] = 
+            NumAstros =  randomRange(36, 42);
+            orbitspeed = randomRange(-100, 100);
+            orbitspeed = (orbitspeed == 0) ? 1 : orbitspeed;
+
+            per = randomRange(randomRange(-10, -5), randomRange(5, 10));
+            per = (per == 0) ? 1 : orbitspeed;
+
+            var mat;
+
+            ringsList[i] =
             {
-                radius: 1.5424, tilt: 0, N1: 125.1228, N2: 0,
-                i1: randomRange(0,360), i2: 0, w1: 318.0634, w2: 0.1643573223,
-                a1: randomRange(planetSize/1000 + .02, 0.32), a2: 0, e1: 0, e2: 0,
-                M1: 115.3654, M2: 13.0649929509, period: 1, moonSize :  size,
-                moonObject : createMoon(size, mat),
-                moonOrbit : 0, orbitSpeedMult : randomRange(-2, 2), inMoon : false, text : false 
+            radius: 1.5424, tilt: planetTilt, N1: 125.1228, N2: 0,
+            i1: 0, i2: 0, w1: 360, w2: 0.27,
+            a1: orbitrangeOutter, a2: 0, a3: orbitrangeInner, a4: 0, e1: 0, e2: 0, isFlat : flat,
+            M1: 115.3654, M2: 13.0649929509, period: per, NumAstros :  NumAstros,
+            Ring: new THREE.Object3D(), orbitSpeedMult : orbitspeed, astoList : []
             }
         }
 
     }
 
-    function createPlanet(init)
+    function InitializeMoonData(moonList, vertex_text, fragment_text)
     {
-        if(!init)
-        {
-            scene.remove(planet);
-            scene.remove(moon);
-            scene.remove(outline);
-            scene.remove(moonorbit);
-            planetText.element.remove();
-           
         for(var i = 0; i < moonList.length; i++)
-        {   
-            moonList[i].text.element.remove();
-            scene.remove(moonList[i].moonObject);
-            scene.remove(moonList[i].moonOrbit);
-        }
-            CalculateParametres();
-        }
+        {
 
-        var segmentCount = 32,
-        radius = planetSize + 1,
-        geometry = new THREE.Geometry(),
-        material = new THREE.LineBasicMaterial({ color: 0xFFFFFF });
-
-
-        //for (var i = 0; i < segmentCount; i++) 
-        //{
-        //    var theta = (i / segmentCount) * Math.PI * 4;
-        //    geometry.vertices.push(
-        //    new THREE.Vector3(
-        //    Math.cos(theta) * radius,
-        //    Math.sin(theta) * radius, 0));            
-        //}
-//
-        //outline = new THREE.Line(geometry, material);
-        //outline.position.z = camera.position.z - 5;
-        //
-        //if(!scene.getObjectByName('outline')) scene.add(outline);
-        //outline.parent = camera;
+        var roll = randomRange(0,10);
         
-        var map = new MapGenerator(octaves, persistance, lacunarity, 
-            seed, noiseScale, offset, textureSize);
+        var mat;
+        size =  randomRange(1, Math.round(planetSize/4));
+        orbitspeed = randomRange(-2, 2);
+        orbitspeed = (orbitspeed == 0) ? 1 : orbitspeed;
 
-        var dataTexture = new THREE.DataTexture
-        (
-        Uint8Array.from(map),
-        textureSize,
-        textureSize,
-        THREE.RGBFormat,
-        THREE.UnsignedByteType,
+        if(roll > 2.2)
+            {
+                
+            moonData = createPlantiodData(octaves, persistance, lacunarity, 
+            seed, 128, offset, 24);
+            
+            var uniform = createUniforms(moonData.map);
+
+            moonMaterial =  new THREE.ShaderMaterial ({
+            uniforms: THREE.UniformsUtils.merge([
+            THREE.UniformsLib['lights'], 
+            uniform]),
+            vertexShader: vertex_text,
+            fragmentShader: fragment_text,
+            lights : true  
+            });
+
+            moonMaterial.uniforms.texture.value = moonData.map;
+            mat = moonMaterial;
+
+            }
+            else
+            { 
+
+            var uniform = createUniforms(null);
+
+            moonMaterial = new THREE.ShaderMaterial ({
+            uniforms: THREE.UniformsUtils.merge([
+            THREE.UniformsLib['lights'], 
+            uniform]),
+            vertexShader: vertex_text,
+            fragmentShader: fragment_text,
+            lights : true  
+            });
+
+                moonMaterial.uniforms.texture.value = null;
+                moonMaterial.uniforms.texture.value = null;
+                mat = moonMaterial;
+            }
+
+            moonList[i] = 
+            {
+
+            //Again Much Credit To The Folks At Qt:
+            //https://doc.qt.io/qt-5/qt3d-planets-qml-planets-js.html 
+            //Smexcity !!!
+
+            // radius - planet radius in millions of meters
+            // tilt - planet axis angle
+            // N1 N2 - longitude of the ascending node
+            // i1 i2 - inclination to the ecliptic (plane of the Earth's orbit)
+            // w1 w2 - argument of perihelion
+            // a1 a2 - semi-major axis, or mean distance from Sun
+            // e1 e2 - eccentricity (0=circle, 0-1=ellipse, 1=parabola)
+            // M1 M2 - mean anomaly (0 at perihelion; increases uniformly with time)
+            // period - sidereal rotation period
+            // centerOfOrbit - the planet in the center of the orbit
+            // (orbital elements based on http://www.stjarnhimlen.se/comp/ppcomp.html)
+            //i1: 115.1454
+
+            radius: 1.5424, tilt: 0, N1: 125.1228, N2: 0,
+            i1: randomRange(-60,60), i2: 0, w1: 318.0634, w2: 0.1643573223,
+            a1: randomRange(planetSize/1000 + .02, 0.32), a2: 0, e1: 0, e2: 0,
+            M1: 115.3654, M2: 13.0649929509, period: 1, moonSize :  size,
+            moonObject : createMoon(size, mat), material: mat,
+            moonOrbit : 0, orbitSpeedMult : orbitspeed, inMoon : false, text : false 
+            }
+        }
+
+    } 
+
+    function CreateUI(position)
+    {
+        var square = new THREE.Geometry();
+        square.vertices.push(new THREE.Vector3(0, 0, 0));
+        square.vertices.push(new THREE.Vector3(0, boxsize, 0));
+        square.vertices.push(new THREE.Vector3(boxsize, boxsize, 0));
+        square.vertices.push(new THREE.Vector3(boxsize, 0, 0));
+
+        square.vertices.push(new THREE.Vector3(0, 0, 0));
+
+        square.faces.push(new THREE.Face3(0, 1, 2));
+        square.faces.push(new THREE.Face3(0, 3, 2));
+
+        var UI = new THREE.Line(square, new THREE.LineDashedMaterial({
+	    color: 0xfff000,
+	    dashSize: 2,
+	    gapSize: 5,
+	    linewidth: 1
+      }));
+        
+        UI.position.set(position.x, position.y, position.z);
+
+        return UI;
+    }
+    function setUpSky(start, vertex_text, fragment_text)
+    {
+        skyboxuniforms =
+        {
+            resolution: { type: "v2", value: new THREE.Vector2() },
+            randomColsMults: { type: "v3", 
+            value: new THREE.Vector3(randomRange(0,10), 
+                                     randomRange(0,10),
+                                     randomRange(0,10)) },
+            time:{type: "f", value:1.0}            
+        }
+
+        var skyMaterial = new THREE.ShaderMaterial(
+        {
+            vertexShader : vertex_text,
+            fragmentShader : fragment_text,
+            uniforms : skyboxuniforms,
+            side: THREE.BackSide, 
+            fog : false
+        });
+
+        var skyBox = new THREE.Mesh(new THREE.SphereGeometry(550,
+        60, 40), skyMaterial);
+
+        BackgroundScene.add(skyBox);
+        skyBox.castShadow = false;
+        skyBox.receiveShadow = false;
+
+        skyboxuniforms.resolution.value.x = window.innerWidth;
+        skyboxuniforms.resolution.value.y = window.innerHeight;
+      
+    }
+
+    function createAtmos(atmoInfo,vertex_text, fragment_text)
+    {
+         var loader = new THREE.TextureLoader();
+         var img = loader.load( "img/gradient-value-equalised2.png");
+
+         //Max AtmoThickness before wierd shit starts is 1.2 or close to that 
+        var myuniforms = 
+        { 
+            Gradient: { type: 't', value: null},
+            fresnelExp :{ type: "f", value: 5.3},
+            transitionWidth:{ type: "f", value: 0.1},
+            atmoThickness:{ type: "f", value: 1.0},    
+            indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
+            palette:{type:"v3v", value: GrayScalePallete},
+            paletteSize:{type:"i", value: 8},
+        }
+
+        atmoMaterial = new THREE.ShaderMaterial 
+        ({
+            uniforms: THREE.UniformsUtils.merge
+            ([
+            THREE.UniformsLib['lights'], 
+            myuniforms 
+            ]),
+                vertexShader: vertex_text,
+                fragmentShader: fragment_text,
+                transparent: true,
+                lights : true
+            }   
         );
 
-        dataTexture.needsUpdate = true;
+        atmoMaterial.uniforms.Gradient.value = img;
         
-        var uniforms = {
-             indexMatrix4x4:{ type: "fv1" , value: [0,  32, 8,  40, 2,  34, 10, 42,
-                                     48, 16, 56, 24, 50, 18, 58, 26,
-                                     12, 44, 4,  36, 14, 46, 6,  38,
-                                     60, 28, 52, 20, 62, 30, 54, 22,
-                                     3,  35, 11, 43, 1,  33, 9,  41,
-                                     51, 19, 59, 27, 49, 17, 57, 25,
-                                     15, 47, 7,  39, 13, 45, 5,  37,
-                                     63, 31, 55, 23, 61, 29, 53, 21]},
+        atmo = new THREE.Mesh(planetGeo, atmoMaterial);
+        atmo.position.set(0, 0, 0);//= planet.position;
+        atmo.scale.multiplyScalar(1.05);
 
-                palette:{type:"v3v", value:[new THREE.Vector3( 0.0, 0.0, 0.0 ),
-                                            new THREE.Vector3( .14, .14, .14 ),
-                                            new THREE.Vector3( .28, .28, .28 ),
-                                            new THREE.Vector3( .43, .43, .43 ),
-                                            new THREE.Vector3( .57, .57, .57 ),
-                                            new THREE.Vector3( .71, .71, .71 ),
-                                            new THREE.Vector3( .85, .85, .85 ),
-                                            new THREE.Vector3( .9, .9, .9)]},
-                paletteSize:{type:"i", value:8},
-               texture: { type: "t", value: dataTexture },
-               lightpos: {type: 'v3', value: new THREE.Vector3(0,30,20) },
-                  noTexture:{type:"i", value:0}
-        };
+        atmo.castShadow = false;
+        atmo.receiveShadow = false;
+        
+        MainScene.add( atmo );
+    }
 
-         PlanetMaterial = new THREE.ShaderMaterial({
-             uniforms: uniforms,
-            vertexShader: $("#vertexshader").text(),
-            fragmentShader: $("#fragmentshader").text()
+    function createPlanet(start, vertex_text, fragment_text)
+    {
+        if(planet !== undefined)
+        {
+            MainScene.remove(planet);
+            MainScene.remove(outline);
+            MainScene.remove(atmo);
+            MainScene.remove(clouds);
+            planetText.element.remove();
+           
+            for(var i = 0; i < moonList.length; i++)
+            {   
+                moonList[i].text.element.remove();
+                MainScene.remove(moonList[i].moonObject);
+                MainScene.remove(moonList[i].moonOrbit);
+            }
+            
+            if(hasRings)
+                {
+                    if (ringsList !== undefined)
+                    {
+                        for(var i = 0; i < ringsList.length; i++)
+                        {   
+                            MainScene.remove(ringsList[i].orbitObject);
+                            MainScene.remove(ringsList[i].Ring);
+                        }
+                    }
+                }
+        }
+
+        CalculateParametres(vertex_text, fragment_text);
+
+        planetData = createPlantiodData(octaves, persistance, lacunarity, 
+            seed, noiseScale, offset, textureSize);
+
+        var vertex = vertex_text;
+        var fragment = fragment_text;
+
+        var uniform = createUniforms(planetData.map);
+
+         PlanetMaterial = new THREE.ShaderMaterial ({
+            uniforms: THREE.UniformsUtils.merge([
+            THREE.UniformsLib['lights'], 
+            uniform ]),
+            vertexShader: textParse(vertex),
+            fragmentShader: textParse(fragment),
+            lights : true           
         });
+
+        PlanetMaterial.uniforms.texture.value = planetData.map;
 
         // instantiate a loader
         var loader = new THREE.TextureLoader();
 
         loader.crossOrigin = '';
 
-        var geometry = new THREE.SphereGeometry(planetSize, 32, 32 );
-        planet = new THREE.Mesh( geometry, PlanetMaterial );
-
+        planetGeo = new THREE.SphereGeometry(planetSize, 32, 32 );
+        planet = new THREE.Mesh( planetGeo, PlanetMaterial );
         planet.castShadow = true; //default is false
         planet.receiveShadow = true; //default
 
-        scene.add(planet);
+        MainScene.add(planet);
         
-        var roll = randomRange(0,10);
-            
-        planetText = createTextLabel();
-        if(roll > 5)
-        planetText.setHTML(word(randomRange(5, 10)));
-        else
-        planetText.setHTML(word(randomRange(4, 12))+ "-" + Math.round(randomRange(0,1000)));
+        planetText = generateName(planet);
 
-        planetText.setParent(planet);
-        container.appendChild(planetText.element);
+        ShaderLoader('js/Shaders/Atmo/AtmoShader.vs.glsl', 
+        'js/Shaders/Atmo/AtmoShader.fs.glsl', setUpAtmosphere, true); 
 
        for(var i = 0; i < moonList.length; i++)
-           {
+        {
+        moonList[i].moonOrbit = DrawOrbit(moonList[i], planet, clock.getElapsedTime(), 1000);
+        MainScene.add(moonList[i].moonObject);
 
-            orbit(moonList[i], moonList[i].moonObject, planet, randomRange(0,10000), 1000,  randomRange(0,10000));
-            moonList[i].moonOrbit = DrawOrbit(moonList[i], moon, planet, clock.getElapsedTime(), 1000);
-            scene.add(moonList[i].moonObject);
+        if(moonList[i].moonOrbit != 0)
+        MainScene.add(moonList[i].moonOrbit);
 
-            if(moonList[i].moonOrbit != 0)
-            scene.add(moonList[i].moonOrbit);
+        moonList[i].text = generateName(moonList[i].moonObject);
+        }  
+        
+        var roll = randomRange(0, 10);
 
-            var roll = randomRange(0,10);
-            
-            moonList[i].text = createTextLabel();
-            if(roll > 5)
-            moonList[i].text.setHTML(word(randomRange(4, 12))+ "-" + Math.round(randomRange(0,1000)));
-            else
-            moonList[i].text.setHTML(word(randomRange(4, 12))); 
+        if(roll >= 6)
+        {
+            hasRings = true;
+        ShaderLoader('js/Shaders/Asto/Asto.vs.glsl', 
+        'js/Shaders/Asto/Asto.fs.glsl', setUpRings, true); 
+        }
+        else
+        {
+            hasRings = false;
+        }
 
-            moonList[i].text.setParent(moonList[i].moonObject);
-            container.appendChild(  moonList[i].text.element);
+        ShaderLoader('js/Shaders/Cloud/Cloud.vs.glsl', 
+        'js/Shaders/Cloud/Cloud.fs.glsl', setUpClouds, 1.1); 
 
-           }   
+
+    }
+
+    function createClouds(cloudsizeMult, vertex_text, fragment_text)
+    {
+
+       var cloudOctaves = 2;
+       var cloudpersistance = .02;
+       var cloudlacunarity = 1;
+       var cloudnoiseScale = randomRange(10,10);
+
+        cloudsData = createCloudData(cloudOctaves, cloudpersistance, cloudlacunarity, 
+            1, cloudnoiseScale, new THREE.Vector2(0,0), textureSize);
+
+        var vertex = vertex_text;
+        var fragment = fragment_text;
+
+        var uniform = 
+        {
+                texture: { type: "t", value: null },
+                color: { type: "vf3", value: new THREE.Vector3(255, 255, 255)},
+        };
+
+         CloudsMaterial = new THREE.ShaderMaterial ({
+            uniforms: THREE.UniformsUtils.merge([
+            THREE.UniformsLib['lights'], 
+            uniform ]),
+            vertexShader: textParse(vertex),
+            fragmentShader: textParse(fragment),
+            lights : true,
+        
+        });
+
+        CloudsMaterial.uniforms.texture.value = cloudsData.map;
+
+        cloudsGeo = new THREE.SphereGeometry(planetSize, 32, 32 );
+        clouds = new THREE.Mesh( cloudsGeo, CloudsMaterial );
+        clouds.scale.multiplyScalar(1.1);
+        //clouds.castShadow = true; //default is false
+        clouds.receiveShadow = true; //default
+
+        //MainScene.add(clouds);  
     }
 
     function createMoon(moonSize, mat)
     {         
-        var moon = new THREE.Mesh( new THREE.SphereGeometry(moonSize, 12, Math.PI * 2 ), mat );
+        var moon = new THREE.Mesh( new THREE.SphereGeometry(moonSize, 12,  Math.PI * 2 ), mat );
         
         moon.castShadow = true; //default is false
-        moon.receiveShadow = true; //default
+        moon.receiveShadow = true; //default+
         return moon;
     }
 
-    function anim()
+    function createUniforms(texture)
     {
-       
-       //// a texture with 10 frames arranged horizontally, display each for 75 millisec
-       //anim = new TextureAnimator( gene , 21, 1, 21, 65); 
-       //gene.magFilter = THREE.NearestFilter;
-       //gene.minFilter = THREE.NearestFilter;
-       //var spriteMaterial = new THREE.SpriteMaterial( { map: gene} );	
-       //var Genesprite = new THREE.Sprite( spriteMaterial );
-
-       //Genesprite.scale.set(10, 10, 10);
-       //
-       //scene.add( Genesprite );	
-       //Genesprite.lookAt(scene.position);
+        return uniform =
+        {
+                indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
+                palette:{type:"v3v", value: GrayScalePallete},
+                paletteSize:{type:"i", value:8},
+                texture: { type: "t", value: null },
+                lightpos: {type: 'v3', value: new THREE.Vector3(0,30,20) },
+                noTexture:{type:"i", value:(texture == null) ? 1 : 0}
+        };
     }
 
-    function DrawOrbit(planet, object, centre, currTimeD, auScale)
+    function createPlantiodData(octaves, persistance, lacunarity, seed, noiseScale, offset, size)
     {
-        var segmentCount = 36;
-        var radius = planetSize;
-        var lines = new THREE.Geometry();
-
-        for (var i = 0; i < segmentCount; i++) 
-        {              
-        // Calculate the planet orbital elements from the current time in days
-        var N =  (planet["N1"] + planet["N2"] * i) * Math.PI / 180;
-        var iPlanet = (planet["i1"] + planet["i2"] * i) * Math.PI / 180;
-        var w =  (planet["w1"] + planet["w2"] * i) * Math.PI / 180;
-        var a = planet["a1"] + planet["a2"] * i;
-        var e = planet["e1"] + planet["e2"] * i;
-        var M = (planet["M1"] + planet["M2"] * i) * Math.PI / 180;
-        var E = M + e * Math.sin(M) * (1.0 + e * Math.cos(M));
-
-        var xv = a * (Math.cos(E) - e);
-        var yv = a * (Math.sqrt(1.0 - e * e) * Math.sin(E));
-        var v = Math.atan2(yv, xv);
-
-        // Calculate the distance (radius)
-        var r = Math.sqrt(xv * xv + yv * yv);
-
-        // From http://www.davidcolarusso.com/astro/
-        // Modified to compensate for the right handed coordinate system of OpenGL
-        var xh = r * (Math.cos(N) * Math.cos(v + w)
-                      - Math.sin(N) * Math.sin(v + w) * Math.cos(iPlanet));
-        var zh = -r * (Math.sin(N) * Math.cos(v + w)
-                       + Math.cos(N) * Math.sin(v + w) * Math.cos(iPlanet));
-        var yh = r * (Math.sin(w + v) * Math.sin(iPlanet));
-
-        // Apply the position offset from the center of orbit to the bodies
-        var centerOfOrbit = centre;//objects[planet["centerOfOrbit"]];
-
-            lines.vertices.push(
-            new THREE.Vector3(
-            centerOfOrbit.position.x + xh * auScale,
-            centerOfOrbit.position.y + yh * auScale,
-            centerOfOrbit.position.z + zh * auScale));            
-        }
-
-
-        lines.computeLineDistances();
-        moonorbit = new THREE.Line(lines, new THREE.LineDashedMaterial({
-	    color: 0xffffff,
-	    dashSize: 100,
-	    gapSize: 100,
-	    linewidth: 1
-      }));
+          var planetInfo = new MapGenerator(octaves, persistance, lacunarity, 
+          seed, noiseScale, offset, size, false);
+        
+          const dataTexture = new THREE.DataTexture
+          (
+          Uint8Array.from(planetInfo.map),
+          size,
+          size,
+          THREE.RGBFormat,
+          THREE.UnsignedByteType,
+          );
       
-      return moonorbit;
+          dataTexture.needsUpdate = true;
+          
+          return new PlanetInformation(dataTexture, planetInfo.hasAtmo, planetInfo.hasLiquad);
+    }
+
+    function createCloudData(octaves, persistance, lacunarity, seed, noiseScale, offset, size)
+    {
+          var cloudInfo = new MapGenerator(octaves, persistance, lacunarity, 
+          seed, noiseScale, offset, size, true);
+        
+          const dataTexture = new THREE.DataTexture
+          (
+          Uint8Array.from(cloudInfo.map),
+          size,
+          size,
+          THREE.RGBFormat,
+          THREE.UnsignedByteType,
+          );
+      
+          dataTexture.needsUpdate = true;
+          
+          return new PlanetInformation(dataTexture, cloudInfo.hasAtmo, cloudInfo.hasLiquad);
+    }
+
+    function generateName(parent)
+    {
+        var roll = randomRange(0,10);
+
+        var newText = createTextLabel();
+        if(roll > 5)
+        newText.setHTML(word(randomRange(4, 12))+ "-" + Math.round(randomRange(0,1000)));
+        else
+        newText.setHTML(word(randomRange(4, 12))); 
+
+        newText.setParent(parent);
+        container.appendChild(newText.element);
+
+        return newText;
+    }
+
+    // Credit to THeK3nger - https://gist.github.com/THeK3nger/300b6a62b923c913223fbd29c8b5ac73
+    //Sorry to any soul that bare's witness to this Abomination....May the gods have mercy on me
+    function ShaderLoader (vertex_url, fragment_url, onLoad, Custom, onProgress, onError)   
+    {
+        var vertex_loader = new THREE.FileLoader(THREE.DefaultLoadingManager);
+        vertex_loader.setResponseType('text');
+        vertex_loader.load(vertex_url, function (vertex_text) {
+            var fragment_loader = new  THREE.FileLoader(THREE.DefaultLoadingManager);
+            fragment_loader.setResponseType('text');
+                fragment_loader.load(fragment_url, function (fragment_text) {
+                    var shadow_loader = new  THREE.FileLoader(THREE.DefaultLoadingManager);
+                     shadow_loader.setResponseType('text');
+                        shadow_loader.load("js/Shaders/Shadow.glsl", function (shadow_text)  {
+                                var dither_loader = new  THREE.FileLoader(THREE.DefaultLoadingManager);
+                                dither_loader.setResponseType('text');
+                                dither_loader.load("js/Shaders/Dither.glsl", function (dither_text)  
+                                    {
+                                         onLoad(Custom, textParse(vertex_text, shadow_text, dither_text), textParse(fragment_text, shadow_text, dither_text));
+                                    }
+                        
+                        )});
+        })}, onProgress, onError);
+    }
+    
+    //Dummy Methods To Pass Pararemtres threw the Async Loader func
+    function setUpPlanet(init, vertex_text, fragment_text)
+    {   
+        createPlanet(init, vertex_text, fragment_text);
+    }
+    function setUpClouds(cloudsizeMult, vertex_text, fragment_text)
+    {   
+        createClouds(cloudsizeMult, vertex_text, fragment_text);
+    }
+    function setUpAtmosphere(atmoInfo, vertex_text, fragment_text)
+    {   
+        createAtmos(atmoInfo, vertex_text, fragment_text);
+    }
+  
+    function SetUpFlatBelt(ringData, vertex_text, fragment_text)
+    {
+        CreateFlatBelt(ringData.data, vertex_text, fragment_text);
     }

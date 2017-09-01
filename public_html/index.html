@@ -69,219 +69,46 @@
 
 	</script>
 
-<div id="webGL-container">
+	<div id="webGL-container">
 	
 	<!-- Three JS -->
-    <script type="text/javascript" src="js/three.js"></script>    
-    <script type="text/javascript" src="js/Projector.js"></script>
-    <script type="text/javascript" src="js/CanvasRenderer.js"></script>
-    <script type="text/javascript" src="js/OrbitControls.js"></script> 
-    <script type="text/javascript" src="js/WorldData.js"></script>
-	<script type="text/javascript" src="js/ThreeAnimator.js"></script> 
-	<script type="text/javascript" src="js/dat.gui.min.js"></script> 
+    <script type="text/javascript" src="js/THREE/three.js"></script>    
+    <script type="text/javascript" src="js/THREE/Projector.js"></script>
+    <script type="text/javascript" src="js/THREE/CanvasRenderer.js"></script>
+    <script type="text/javascript" src="js/THREE/OrbitControls.js"></script> 
+    <script type="text/javascript" src="js/THREE/WorldData.js"></script>
+	<script type="text/javascript" src="js/THREE/ThreeAnimator.js"></script> 
+	<script type="text/javascript" src="js/THREE/dat.gui.min.js"></script> 
+	<script type="text/javascript" src="js/THREE/Gyroscope.js"></script>
 
-	<!-- Math Helpers -->
-	<script type="text/javascript" src="js/MathHelper/perlin.js"></script> 
-	<script type="text/javascript" src="js/MathHelper/Vector2.js"></script> 
-	<script type="text/javascript" src="js/MathHelper/utilities.js"></script> 
+	<!--Post Processing Stuff -->
+	<script type="text/javascript" src="js/THREE/EffectComposer.js"></script>
+    <script type="text/javascript" src="js/THREE/RenderPass.js"></script>
+	<script type="text/javascript" src="js/THREE/CopyShader.js"></script>
+	<script type="text/javascript" src="js/THREE/ShaderPass.js"></script>
+	<script type="text/javascript" src="js/THREE/BloomPass.js"></script>
+	<script type="text/javascript" src="js/THREE/BokehPass.js"></script>
+	<script type="text/javascript" src="js/THREE/BokehShader.js"></script>
+	<script type="text/javascript" src="js/THREE/ConvolutionShader.js"></script>
+	<script type="text/javascript" src="js/Shaders/DitherLight/DitherParameters.js"></script>
+	<script type="text/javascript" src="js/Helpers/ColorPalletes.js"></script>
+
+	<!--Helpers -->
+	<script type="text/javascript" src="js/Helpers/perlin.js"></script> 
+	<script type="text/javascript" src="js/Helpers/Vector2.js"></script> 
+	<script type="text/javascript" src="js/Helpers/utilities.js"></script> 
+
+	<script type="text/javascript" src="js/Loaders.js"></script> 
+	<script type="text/javascript" src="js/LaberGenerator.js"></script> 
+	<script type="text/javascript" src="js/GibbirishGenerator.js"></script> 
 
 	<!-- World Generator -->
 	<script type="text/javascript" src="js/WorldGenerator/FallOffGenerator.js"></script>  
 	<script type="text/javascript" src="js/WorldGenerator/MapGenerator.js"></script> 
-	<script type="text/javascript" src="js/WorldGenerator/Noise.js"></script> 
+	<script type="text/javascript" src="js/WorldGenerator/Noise1D.js"></script> 
+	<script type="text/javascript" src="js/WorldGenerator/Noise2D.js"></script> 
 	<script type="text/javascript" src="js/WorldGenerator/Regions.js"></script> 
 	
-	<!-- Shader Files -->
-	<script type="x-shader/x-vertex" id="vertexshader">
-		varying vec2 vUv;
-
-		varying vec3 lightdir;
- 		varying vec3 eyenorm;
- 		uniform vec3 lightpos;
-
-		
-		void main() 
-		{	
-			vUv = uv;
-			
-			vec4 eyepos = modelViewMatrix * vec4 (position, 1.0);
-			vec4 lighteye = viewMatrix * vec4 (lightpos, 1.0);
-
-			vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-			gl_Position = projectionMatrix * modelViewPosition;
-
-			
-			vec4 tmp = modelViewMatrix * vec4 (lightpos, 1.0);
-			lightdir = lighteye.xyz - eyepos.xyz;
-			eyenorm = normalMatrix * normal;
-		}
-	</script> 
-
-
-	<!-- Credit to : https://sites.google.com/site/threejstuts/home/shader-toon  &
-					 http://alex-charlton.com/posts/Dithering_on_the_GPU/#fn6 -->
-
-	<script type="x-shader/x-fragment" id="fragmentshader">
-
-			uniform vec3 palette[8];
-			uniform int paletteSize;
-			uniform int noTexture;
-			const float lightnessSteps = 4.0;	
-
-		    uniform float indexMatrix4x4[64];
-			const int num = 64;		 
-			varying vec3 lightdir;
- 			varying vec3 eyenorm;
-			uniform sampler2D texture;		 	
-			varying vec2 vUv;
-
-			float lightnessStep(float l) 
-			{
-				/* Quantize the lightness to one of `lightnessSteps` values */
-				return floor((0.5 + l * lightnessSteps)) / lightnessSteps;
-			}
-
-			float indexValue() 
-			{
-				float x = (mod(gl_FragCoord.x, 8.0));
-				float y = (mod(gl_FragCoord.y, 8.0));
-				
-				float grabby = 1.0;
-				
-				for(int i = 0; i < 64; i++)
-				{
-					if(i == int(x + y * 8.0))
-					{
-						grabby = indexMatrix4x4[i];
-						break;
-					}
-				}
-
-				return grabby/64.0;
-			}
-
-			float ditherMap(float color) 
-			{
-			float closestColor = (color < 0.5) ? 0.0 : 1.0;
-			float secondClosestColor = 1.0 - closestColor;
-			float d = indexValue();
-			float distance = abs(closestColor - color);
-			return (distance < d) ? closestColor : secondClosestColor;
-			}
-
-			vec3 hslToRgb(vec3 c )
-			{
-			vec3 rgb = clamp( abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );
-			return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
-			}
-
-			vec3 rgbToHsl(vec3 c )
-			{
-			float h = 0.0;
-				float s = 0.0;
-				float l = 0.0;
-				float r = c.r;
-				float g = c.g;
-				float b = c.b;
-				float cMin = min( r, min( g, b ) );
-				float cMax = max( r, max( g, b ) );
-
-				l = ( cMax + cMin ) / 2.0;
-				if ( cMax > cMin ) {
-					float cDelta = cMax - cMin;
-					
-					//s = l < .05 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) ); Original
-					s = l < .0 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) );
-					
-					if ( r == cMax ) {
-						h = ( g - b ) / cDelta;
-					} else if ( g == cMax ) {
-						h = 2.0 + ( b - r ) / cDelta;
-					} else {
-						h = 4.0 + ( r - g ) / cDelta;
-					}
-
-					if ( h < 0.0) {
-						h += 6.0;
-					}
-					h = h / 6.0;
-				}
-				return vec3( h, s, l );
-			}
-
-			float hueDistance(float h1, float h2) 
-			{
-			float diff = abs((h1 - h2));
-			return min(abs((1.0 - diff)), diff);
-			}
-
-			vec3 dither(vec3 color) 
-			{
-			vec3 hsl = rgbToHsl(color);
-
-			vec3 ret[2];
-			vec3 closest = vec3(-2, 0, 0);
-			vec3 secondClosest = vec3(-2, 0, 0);
-			vec3 temp;
-
-			for (int i = 0; i < 8; ++i) 
-			{
-				temp = palette[i];
-				float tempDistance = hueDistance(temp.x, hsl.x);
-
-				if (tempDistance < hueDistance(closest.x, hsl.x)) 
-				{
-					secondClosest = closest;
-					closest = temp;
-				} 
-				else 
-				{
-					if (tempDistance < hueDistance(secondClosest.x, hsl.x)) 
-					{
-						secondClosest = temp;
-					}
-				}
-			}
-			  	ret[0] = closest;
-				ret[1] = secondClosest;
-	
-				float d = indexValue();
-				float hueDiff = hueDistance(hsl.x, ret[0].x) / hueDistance(ret[1].x, ret[0].x);
-
-				float l1 = lightnessStep(max((hsl.z - 0.125), 0.0));
-				float l2 = lightnessStep(min((hsl.z + 0.124), 1.0));
-				float lightnessDiff = (hsl.z - l1) / (l2 - l1);
-
-				vec3 resultColor = (hueDiff < d) ? ret[0] : ret[1];
-				resultColor.z = (lightnessDiff < d) ? l1 : l2;
-				return hslToRgb(resultColor);
-			}
-
-		void main()
-		{
-
-			float ndotl = dot(normalize (eyenorm), normalize (lightdir));
-			float ndotl2 = pow(dot(normalize (eyenorm), normalize (lightdir)), 1.0);
-
-			ndotl = ndotl;
-
-			vec3 lightColor = vec3(ndotl,ndotl,ndotl);
-
-			vec4 light = vec4(dither(lightColor), 1.0);
-
-			vec4 color;
-
-			if(noTexture == 1)
-			{
-			color = vec4(0.5, 0.5, 0.5, 1.0);
-			}
-			else
-			{
-				color = texture2D(texture, vUv);
-			}
-			gl_FragColor = color * (light);
-		}
-	</script>  
 
 	<!-- Main -->
 	<script type="text/javascript" src="js/main.js"></script>  
@@ -298,28 +125,5 @@
         </div>
 				
 </div>
-      
- <!--       <section id="boxes">   
-    		<div class="container">
-    			<div class="box">
-    				<img src="./img/GameDev_Logo.png">
-    				<h3>Game Development</h3>
-    				 <p>All things Game related</p>
-    			</div>
-    			<div class="box">
-    				<img src="./img/SoftWare_Logo.png">
-    				<h3>Software Development</h3>
-    				<p>All things Software related</p>
-    			</div>
-    			<div class="box">
-    				<img src="./img/Art_Logo.png">
-    				<h3>Art and Design</h3>
-    				<p>All things Art related</p>
-    			</div>
-    		</div>
-        </section>  
-        
-     //-->  
-      
     </body>
 </html>

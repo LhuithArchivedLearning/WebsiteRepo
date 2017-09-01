@@ -1,5 +1,5 @@
 
-    function GenerateNoiseMap(mapWidth, mapHeight, seed, scale, octaves, persistance, lacunarity, offset)
+    function GenerateNoise2DMap(mapWidth, mapHeight, seed, scale, octaves, persistance, lacunarity, offset)
     {
         var  noiseMap =  new Array();
         

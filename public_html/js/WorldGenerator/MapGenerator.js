@@ -1,11 +1,13 @@
  
-   function MapGenerator (octaves, persistance, lacunarity, seed, noiseScale, offset, size)
+   function MapGenerator (octaves, persistance, lacunarity, seed, noiseScale, offset, size, isclouds)
     {
-        var noiseMap = GenerateNoiseMap(size, size, seed, noiseScale, octaves, persistance, lacunarity, offset);
+        var noiseMap2D = GenerateNoise2DMap(size, size, seed, noiseScale, octaves, persistance, lacunarity, offset);
+        var noiseMap1D = GenerateNoise1DMap(size, size, seed, noiseScale, octaves, persistance, lacunarity, offset);
+        
         var falloffMap = GenerateFalloffMap(size);
         var colorMap = new Array();
         var clampedMap = new Array();
-        var regions = regionRoll();
+        var regions = regionRoll(isclouds);
         
         for(var x = 0; x < size; x++)
          {
@@ -21,23 +23,30 @@
         {
             for(var x = 0; x < size; x++)
             {
-                clampedMap[x][y] = Clamp(noiseMap[x][y] - falloffMap[x][y], 0, 1);
+                if(regions.isGassy)
+                {
+                    clampedMap[x][y] = Clamp(noiseMap1D[x][y] - falloffMap[x][y], 0, 1);
+                }
+                else
+                {
+                    clampedMap[x][y] = Clamp(noiseMap2D[x][y] - falloffMap[x][y], 0, 1);
+                }
                 //clampedMap[x, y] = (noiseMap[x][y]);
             }
         }
 
         for(var y = 0; y < size; y++)
-        {
+        {          
             for(var x = 0; x < size; x++)
             {
                 var currentHeight = clampedMap[x][y];
           
-                for(var i = 0; i < regions.length; i++)
+                for(var i = 0; i < regions.Data.length; i++)
                 {
                    
-                    if(currentHeight >= regions[i].height)
+                    if(currentHeight >= regions.Data[i].height)
                     {
-                        colorMap[y * size + x] = regions[i].color;     
+                        colorMap[y * size + x] = regions.ColorPallette[i].RGB;     
                     }
                     else
                     {   
@@ -57,15 +66,22 @@
                 finalmap[i + 2] =  colorMap[i / 3].b;
 
             } 
-
-       return finalmap;
+       return new PlanetInformation(finalmap, regions.hasAtmo, regions.hasLiquad);
     };
 
-function TerrainType(name, height, color)
+function PlanetInformation(map, hasAtmo, hasLiquad)
+{
+    this.map = map;
+    this.hasAtmo = hasAtmo;
+    this.hasLiquad = hasLiquad;
+}
+
+function TerrainType(name, height, color, hasAtmo = false, hasLiquad = false)
 {
 	 this.name = name;
 	 this.height = height;
-     this.color = color;
+     this.hasAtmo = hasAtmo;
+     this.hasLiquad = hasLiquad;
 };
 
 
