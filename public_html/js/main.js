@@ -15,7 +15,7 @@
     var textureSize = 256;
     var mouseDown = false;
     var boxsize = 25;
-    var planetSize, inPlanet, planet, planetText, atmoMaterial, planetTilt, hasRings, 
+    var planetSize, planetData, inPlanet, planet, planetText, atmoMaterial, planetTilt, hasRings, 
     PlanetMaterial, moonList, ringsList, outline, atmo, clouds, planetGeo, planetRotationPeriod;
     var ShaderDataInfo = {vs:'', fs : ''};
     var skyboxuniforms;
@@ -486,7 +486,7 @@
         InitializeMoonData(moonList, vertex_text, fragment_text);
     }
 
-    function setUpRings(start, vertex_text, fragment_text)
+    function setUpRings(colors, vertex_text, fragment_text)
     {
         ringsList = new Array(Math.round(randomRange(1,5)));
 
@@ -501,7 +501,7 @@
                         CreateRockyBelt(ringsList[i], planet,clock.getElapsedTime(), 
                                                     1000, ringsList[i].NumAstros, ringsList[i].Ring, 
                                                     vertex_text, fragment_text, dirLight.position, 
-                                                    ringsList[i].astoList);   
+                                                    ringsList[i].astoList, colors);   
                     }
                     else
                     {
@@ -867,7 +867,7 @@
         {
             hasRings = true;
         ShaderLoader('js/Shaders/Asto/Asto.vs.glsl', 
-        'js/Shaders/Asto/Asto.fs.glsl', setUpRings, true); 
+        'js/Shaders/Asto/Asto.fs.glsl', setUpRings, planetData.colors); 
         }
         else
         {
@@ -959,7 +959,7 @@
       
           dataTexture.needsUpdate = true;
           
-          return new PlanetInformation(dataTexture, planetInfo.hasAtmo, planetInfo.hasLiquad);
+          return new PlanetInformation(dataTexture, planetInfo.hasAtmo, planetInfo.hasLiquad, planetInfo.colors);
     }
 
     function createCloudData(octaves, persistance, lacunarity, seed, noiseScale, offset, size)

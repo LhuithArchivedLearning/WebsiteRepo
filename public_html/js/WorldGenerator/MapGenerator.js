@@ -7,7 +7,12 @@
         var falloffMap = GenerateFalloffMap(size);
         var colorMap = new Array();
         var clampedMap = new Array();
-        var regions = regionRoll(isclouds);
+        var regions;
+        var colors;
+
+        
+                regions = regionRoll(isclouds);
+        colors = regions.ColorPallette;
         
         for(var x = 0; x < size; x++)
          {
@@ -66,22 +71,21 @@
                 finalmap[i + 2] =  colorMap[i / 3].b;
 
             } 
-       return new PlanetInformation(finalmap, regions.hasAtmo, regions.hasLiquad);
+       return new PlanetInformation(finalmap, false, false, colors);
     };
 
-function PlanetInformation(map, hasAtmo, hasLiquad)
+function PlanetInformation(map, hasAtmo, hasLiquad, colors)
 {
     this.map = map;
     this.hasAtmo = hasAtmo;
     this.hasLiquad = hasLiquad;
+    this.colors = colors;
 }
 
-function TerrainType(name, height, color, hasAtmo = false, hasLiquad = false)
+function TerrainType(name, height)
 {
 	 this.name = name;
 	 this.height = height;
-     this.hasAtmo = hasAtmo;
-     this.hasLiquad = hasLiquad;
 };
 
 

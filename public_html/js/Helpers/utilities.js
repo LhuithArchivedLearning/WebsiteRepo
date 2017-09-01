@@ -124,7 +124,7 @@
     }
 
     function CreateRockyBelt(ringData, centre, currTimeD, auScale, numAstos, 
-                                          ringObject, vertex_text, fragment_text, lightpos, list)
+                            ringObject, vertex_text, fragment_text, lightpos, list, colors)
     {
         var segmentCount = numAstos;
         var radius = planetSize;
@@ -160,7 +160,7 @@
         var uniform =
         {
                 texture: { type: "t", value: null },
-                color: { type: "vf3", value: BlushingSunriseColor[Math.round(randomRange(0, BlushingSunriseColor.length - 1))].RGB },
+                color: { type: "vf3", value: colors[Math.round(randomRange(0, colors.length - 1))].RGB },
                 lightpos: {type: 'v3', value: lightpos},
         };
 

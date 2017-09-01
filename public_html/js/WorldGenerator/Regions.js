@@ -5,12 +5,12 @@ function regionRoll (isclouds)
             var diceroll = Math.round((randomRange(0, 100)));
 
             var NewRegion;
-            NewRegion = lush;
+            NewRegion = CreateRegion();;
         }
         else
            NewRegion = cloud; 
     
-    CreateRegion();
+  
     NewRegion.isGassy = SortGassyBools(NewRegion);
 
     return NewRegion;
@@ -21,22 +21,34 @@ function CreateRegion()
 {
     var numRegions = randomRange(5,5); // Expand later
     var data = [];
-    var colors = [];
+    var colors = ColorPalletes[Math.round(randomRange(1, ColorPalletes.length -1))];
 
+    var prevoisLevel;
+    var currentLevel = randomRange(0.04, 0.3);
 
     for(var i = 0; i < numRegions; i++)
     {
+        if(i == 0)
+        {
+            prevoisLevel = 0;
+            currentLevel = 0;
+        }
+        else
+        {
+            currentLevel = randomRange(prevoisLevel, prevoisLevel + randomRange(0.1, 0.3));
+            prevoisLevel = currentLevel;
+        }
         data.push
         (
-            new TerrainType("base", 0) //Water be here
+            new TerrainType("base", currentLevel) //Water be here
         )
     }
-
-    console.log(data);
-    var newRegion = RegionInformation
+    //console.log(data);
+    
+    return new RegionInformation
     (
         colors , data ,
-        0, 0, true, colors.toString(), 0
+        0, 0, true, "", 0
     );
 }
 
@@ -85,7 +97,7 @@ function RegionInformation(ColorPallette, Data, atmoSize, atmoThickness, hasLiqu
 
 //Customs Boimes
 var cloud = new RegionInformation(
-    cloudColors,
+    ColorPalletes[0],
 [
  new TerrainType("water deep", 0),
  new TerrainType("water shallow", 0.5)
@@ -96,7 +108,7 @@ var cloud = new RegionInformation(
 
 
 var lush = new RegionInformation(
-    lushColors,
+    ColorPalletes[1],
 [
  new TerrainType("water deep", 0),
  new TerrainType("water shallow", 0.51),
@@ -109,7 +121,7 @@ var lush = new RegionInformation(
 ;
 
 var rock = new RegionInformation(
-    rockColors,
+    ColorPalletes[4],
 [
  new TerrainType("water deep", 0),
  new TerrainType("water deep", 0.1),
@@ -124,7 +136,7 @@ var rock = new RegionInformation(
 ;
 
 var primordial = new RegionInformation(
-    primordialColors,
+    ColorPalletes[6],
 [
  new TerrainType("sand deep", 0),
  new TerrainType("water shallow", 0.35),
@@ -140,7 +152,7 @@ var primordial = new RegionInformation(
 ;
 
 var frozen = new RegionInformation(
-    frozenColors,
+    ColorPalletes[7],
 [
  new TerrainType("water deep", 0),
  new TerrainType("water shallow", .12),
@@ -155,7 +167,7 @@ var frozen = new RegionInformation(
 ;
 
 var liqiud_mathane = new RegionInformation(
-    liqiud_mathaneColors,
+    ColorPalletes[10],
 [
 new TerrainType("ring", 0),
 new TerrainType("ring2", 0.025),
@@ -177,7 +189,7 @@ new TerrainType("ring", 0.9),
 ;
 
 var deadrock =  new RegionInformation(
-    deadrockColors,
+    ColorPalletes[18],
 [
  new TerrainType("water deep", 0),
  new TerrainType("water shallow", 0.1),
