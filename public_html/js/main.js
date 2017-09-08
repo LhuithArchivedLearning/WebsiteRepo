@@ -29,6 +29,7 @@
     var timeLimit = .25;
     var startTime = Date.now();
     
+    var atmoThicknessInfo;
 
 var atmouniforms = 
    { 
@@ -309,8 +310,6 @@ var atmouniforms =
 
         angle += 0.1;
         dirLight.position.set(controls.xPos, controls.yPos, controls.zPos);
-        dirLight.rotation.x += angle;
-        dirLight.rotation.y += angle;
 
         if(planet !== undefined)
         {
@@ -322,7 +321,7 @@ var atmouniforms =
             skyboxuniforms.time.value = 60. * elapsedSeconds;
             PlanetRotation(planet, planetRotationPeriod, planetTilt, delta);
 
-            planetText.updatePosition(planetSize, - planetText.element.clientWidth/2);
+            planetText.updatePosition(planetSize, - planetText.element.clientWidth/2, 75);
            
             if(clouds !== undefined)
             PlanetRotation(clouds, planetRotationPeriod*4, planetTilt, delta);;
@@ -371,7 +370,8 @@ var atmouniforms =
         {
             for(var i = 0; i < moonList.length; i++)
             {                      
-                    moonList[i].text.updatePosition(moonList[i].moonSize,  - planetText.element.clientWidth/2);
+                    moonList[i].text.updatePosition(moonList[i].moonSize, 
+                         - planetText.element.clientWidth/2, 55);
                     
                     orbit(moonList[i], moonList[i].moonObject, 
                     new THREE.Vector3(0,0,0), clock.getElapsedTime() * moonList[i].orbitSpeedMult, 
@@ -838,6 +838,18 @@ var atmouniforms =
 
     function CreateUI(position)
     {
+
+        var spriteMap = new THREE.TextureLoader().load("img/Icons/Refresh.png");
+        var spriteMat = new THREE.SpriteMaterial({map : spriteMap, color: 0xffffff});
+
+        spriteMap.magFilter = THREE.NearestFilter;
+        spriteMap.minFilter = THREE.NearestFilter; 
+
+        var sprite = new THREE.Sprite(spriteMat);
+        sprite.scale.set(35,35,35);
+        MainScene.add(sprite);
+
+
         var square = new THREE.Geometry();
         square.vertices.push(new THREE.Vector3(0, 0, 0));
         square.vertices.push(new THREE.Vector3(0, boxsize, 0));
@@ -850,14 +862,14 @@ var atmouniforms =
         square.faces.push(new THREE.Face3(0, 3, 2));
 
         var UI = new THREE.Line(square, new THREE.LineDashedMaterial({
-	    color: 0xfff000,
+	    color: 0x000000,
 	    dashSize: 2,
 	    gapSize: 5,
 	    linewidth: 1
       }));
         
         UI.position.set(position.x, position.y, position.z);
-
+        sprite.position.set(position.x + boxsize/2, position.y + boxsize/2, 0);
         return UI;
     }
 
@@ -909,7 +921,7 @@ var atmouniforms =
         }
 
          atmouniforms.fresnelExp.value =  randomRange(0.8, 40.0);
-         atmouniforms.atmoThickness.value = randomRange(0.3, 1.2);
+         atmouniforms.atmoThickness.value = randomRange(0.6, 1.5);
          atmouniforms.colorlight.value =  colorsRGBLight[randomRangeRound(0, colorsRGBLight.length - 1)];
 
         atmoMaterial = new THREE.ShaderMaterial 
@@ -926,14 +938,14 @@ var atmouniforms =
             }   
         );
      
-        atmo = new THREE.Mesh(new THREE.IcosahedronGeometry(planetSize * 1.07, 4), atmoMaterial);
+        atmo = new THREE.Mesh(new THREE.IcosahedronGeometry(
+            planetSize * randomRange(1.07, 1.15), 4), atmoMaterial);
         atmo.position.set(0, 0, 0);//= planet.position;
         atmo.castShadow = false;
         atmo.receiveShadow = false;
         
         MainScene.add( atmo );
     }
-
 
     function RemoveOldShizz()
     {
@@ -1041,10 +1053,7 @@ var atmouniforms =
 
         planetText = generateName(planet, "35px", -1000, false);
 
-        planetTextInfo = generateName(planet, "30px", -1000, true);
-        planetTextInfo.setWidthbyPercent(70);
-        planetTextInfo.setHeight(planetSize);
-
+    
         if(ShaderLoadList.atmo.vertex == undefined)
         {
         ShaderLoader('js/Shaders/Atmo/AtmoShader.vs.glsl', 
@@ -1086,6 +1095,11 @@ var atmouniforms =
             {
                     hasRings = false;
             }
+
+            
+        planetTextInfo = generateName(planet, "30px", -1000, true);
+        planetTextInfo.setWidthbyPercent(70);
+        planetTextInfo.setHeight(planetSize);
 
        //ShaderLoader('js/Shaders/Cloud/Cloud.vs.glsl', 
        //'js/Shaders/Cloud/Cloud.fs.glsl', setUpClouds, 1.1); 
@@ -1166,7 +1180,6 @@ var atmouniforms =
         return moon;
     }
 
-
     function createDataMap(map, size)
     {
         var dataTexture;
@@ -1236,16 +1249,29 @@ var atmouniforms =
         var wordtxt = word(randomRange(3, 25));
 
         if(roll > 5 && !isInfo)
+        {
         newText.setHTML(wordtxt + "-" + Math.round(randomRange(0,1000)));
-        else if( !isInfo)
-        newText.setHTML(wordtxt); 
+        }
+        else if(!isInfo)
+        {
+        newText.setHTML(wordtxt);
+        }
         else
         {
-        newText.setHTML("Poo Poo Man " 
+        newText.setHTML(
+        "Moons: " + moonList.length
         + "<br>" +
-        "Gone To Jesus" 
+        "Size: " + Math.round(planetSize) * 100 + " km"
         + "<br>" +
-        "love Ponus" );
+        "Atmo: " + Math.round(((planetSize * 1.07) - planetSize) * 100) + " km"
+          + "<br>" +
+         "Hazards: " + hazards[randomRangeRound(0, hazards.length - 1)]
+         + "<br>" +
+         ""
+         + "<br>" +
+         "This is a totaly Awsome Little Planet Generator"
+         
+        );
         }
 
         newText.setParent(parent);
