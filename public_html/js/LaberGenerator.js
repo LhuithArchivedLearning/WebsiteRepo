@@ -1,8 +1,8 @@
 //Credit to : https://codepen.io/brandonisgreen/pen/Khibx
-    function createTextLabel() 
+    function createTextLabel(fontsize, left) 
     {
 
-    var div = document.createElement('div');
+    var div = document.createElement('p');
     div.className = 'text-label';
     div.style.position = 'absolute';
     div.style.width = 100;
@@ -10,8 +10,8 @@
     div.style.height = 100;
     div.innerHTML = "hi there!";
     div.style.top = -1000;
-    div.style.left = -1000;
-    div.style.fontSize = "50px";
+    div.style.left = left;
+    div.style.fontSize = fontsize;
     var _this = this;
     
     return {
@@ -25,26 +25,26 @@
       setParent: function(threejsobj) {
         this.parent = threejsobj;
       },
-      updatePosition: function(size, isPlanet) {
+      setHeight: function(value) 
+      {
+        this.element.style.top =  25 + '%';  
+      } ,
+
+      setWidthbyPercent: function(value) 
+      {
+        this.element.style.left = value + '%';
+      } ,
+      updatePosition: function(size, offsetx, offsety) 
+      {
         if(parent) 
         {
-            if(isPlanet)
-                {
-           this.position.x = this.parent.position.x - this.element.clientWidth/2;
-           this.position.y = this.parent.position.y + size + 55;
-                }
-        else
-            {
-            this.position.x = this.parent.position.x;
-           this.position.y = this.parent.position.y + size + 25;  
-            }
-        
-          //this.position.copy(this.parent.position);
+           this.position.x = this.parent.position.x + offsetx;
+           this.position.y = this.parent.position.y + size + offsety;        
         }       
         var coords2d = this.get2DCoords(this.position, _this.camera);
         this.element.style.left = coords2d.x + 'px';
         this.element.style.top = coords2d.y + 'px';
-      },
+      } ,
       get2DCoords: function(position, camera) {
         var vector = position.project(camera);
         vector.x = (vector.x + 1)/2 * window.innerWidth;

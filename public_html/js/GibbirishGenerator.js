@@ -1,4 +1,4 @@
-    var firstLetter = "UYEEOOOOOOOIIIIIIIIAAAAAAAAAAAAKJVRRGGNNPPDDDLLLCCCCFFFFMMMMMBBBBBWWWWWWWHHHHHHHHSSSSSSSSTTTTTTTTTTTTTTTTT"; // Most words(17%) start with T. Few start with K. Multiples of the same letter increases the odds of being chosen. 
+    var firstLetter = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Most words(17%) start with T. Few start with K. Multiples of the same letter increases the odds of being chosen. 
     var cDiagraphs = "thhereedndhantledertvetito"; // letter pairs
     var vDiagraphs = "anineronatenesofeaioisouaras"; // letter pairs
     var endL = "estdnryfloghakmpuw";
@@ -11,7 +11,7 @@
 				var theword = "";
 				while(theword.length < (len)){ // word length
             if (theword.length === 0){ 
-              var fLetterPos = (Math.random())*vowel.length;
+              var fLetterPos = Math.round(randomRange(0, firstLetter.length - 1));
                 theword = theword + firstLetter.substr(fLetterPos,1);
               if (fLetterPos > 31){
                 theword = theword+vowel.substr((Math.random())*vowel.length,1);

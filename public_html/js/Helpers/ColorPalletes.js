@@ -352,7 +352,7 @@ new ColorData (0xf8e6e4, new THREE.Color(248,230,228)),
 ],
 
 //Michael
-ZaprothColor = 
+zaprothColor = 
 [
 new ColorData (0xbfefff, new THREE.Color(191,239,255)),
 new ColorData (0xc39679, new THREE.Color(195,150,121)),
@@ -361,14 +361,305 @@ new ColorData (0x6f1f19, new THREE.Color(111,31,25)),
 new ColorData (0x4a708b, new THREE.Color(74,112,139)),
 ],
 
-BlushingSunriseColor = 
+blushingSunriseColor = 
 [
 new ColorData (0xe1f7d5, new THREE.Color(225,247,213)),
 new ColorData (0xffbdbd, new THREE.Color(255,189,189)),
 new ColorData (0xc9c9ff, new THREE.Color(201,201,255)),
 new ColorData (0xffffff, new THREE.Color(255,255,255)),
 new ColorData (0xf1cbff, new THREE.Color(241,203,255)),
+],
+
+yordenhiemColor = 
+[
+new ColorData (0x444400, new THREE.Color(68,68,0)),
+new ColorData (0xee6600, new THREE.Color(238,102,0)),
+new ColorData (0xaa4400, new THREE.Color(170,68,0)),
+new ColorData (0xbbaa11, new THREE.Color(187,170,17)),
+new ColorData (0x779911, new THREE.Color(119,153,17)),
+],
+
+dogearsColor = 
+[
+new ColorData (0xe9bee8, new THREE.Color(233,190,232)),
+new ColorData (0xd2bee9, new THREE.Color(210,190,233)),
+new ColorData (0xbed0e9, new THREE.Color(190,208,233)),
+new ColorData (0xbee9e6, new THREE.Color(190,233,230)),
+new ColorData (0xbedae9, new THREE.Color(190,218,233)),
+],
+
+flamingPurpleColor = 
+[
+new ColorData (0xdb4e4e, new THREE.Color(219,78,78)),
+new ColorData (0xd24459, new THREE.Color(210,68,89)),
+new ColorData (0xcc4e74, new THREE.Color(204,78,116)),
+new ColorData (0x9f4a8e, new THREE.Color(159,74,142)),
+new ColorData (0x6b3f9a, new THREE.Color(107,63,154)),
+],
+
+risingSunColor = 
+[
+new ColorData (0xffc949, new THREE.Color(255,201,73)),
+new ColorData (0xff7d3c, new THREE.Color(255,125,60)),
+new ColorData (0xf62d47, new THREE.Color(246,45,71)),
+new ColorData (0x9a2159, new THREE.Color(154,33,89)),
+new ColorData (0x721264, new THREE.Color(114,18,100)),
+],
+
+moochColor = 
+[
+new ColorData (0xBF4EAC, new THREE.Color(191,78,172)),
+new ColorData (0xB779AD, new THREE.Color(183,121,173)),
+new ColorData (0x84C1D9, new THREE.Color(132,193,217)),
+new ColorData (0xC5BCBB, new THREE.Color(197,188,187)),
+new ColorData (0xCAB179, new THREE.Color(202,177,121)),
+],
+
+dreamycandyColor = 
+[
+new ColorData (0xe2abe5, new THREE.Color(226,171,229)),
+new ColorData (0xb8e2f6, new THREE.Color(184,226,246)),
+new ColorData (0xeef4bc, new THREE.Color(238,244,188)),
+new ColorData (0xf4bbd8, new THREE.Color(244,187,216)),
+new ColorData (0xd4a2f6, new THREE.Color(212,162,246)),
+],
+
+rainbowdashColor = 
+[
+new ColorData (0xf20866, new THREE.Color(242,8,102)),
+new ColorData (0xf9d851, new THREE.Color(249,216,81)),
+new ColorData (0x89f279, new THREE.Color(137,242,121)),
+new ColorData (0x79e5ee, new THREE.Color(121,229,238)),
+new ColorData (0xc073c1, new THREE.Color(192,115,193)),
+],
+
+fluttershyColor = 
+[
+new ColorData (0xf6f287, new THREE.Color(246,242,135)),
+new ColorData (0xfbb0b0, new THREE.Color(251,176,176)),
+new ColorData (0xe3c3ee, new THREE.Color(227,195,238)),
+new ColorData (0xc8f0ef, new THREE.Color(200,240,239)),
+new ColorData (0xf6c5c5, new THREE.Color(246,197,197)),
+],
+
+opalescentColor = 
+[
+new ColorData (0xf2c9f2, new THREE.Color(242,201,242)),
+new ColorData (0xf9c8d2, new THREE.Color(249,200,210)),
+new ColorData (0xcefbbd, new THREE.Color(206,251,189)),
+new ColorData (0xf0f9c3, new THREE.Color(240,249,195)),
+new ColorData (0xbeedee, new THREE.Color(190,237,238)),
+],
+
+jadeColor = 
+[
+new ColorData (0x52bf90, new THREE.Color(82,191,144)),
+new ColorData (0x49ab81, new THREE.Color(73,171,129)),
+new ColorData (0x419873, new THREE.Color(65,152,115)),
+new ColorData (0x398564, new THREE.Color(57,133,100)),
+new ColorData (0x317256, new THREE.Color(49,114,86)),
+],
+
+gatikaColor = 
+[
+new ColorData (0xff3f00, new THREE.Color(255,63,0)),
+new ColorData (0x99cc00, new THREE.Color(153,204,0)),
+new ColorData (0x0066cc, new THREE.Color(0,102,204)),
+new ColorData (0x9966cc, new THREE.Color(153,102,204)),
+new ColorData (0x111122, new THREE.Color(17,17,34)),
+],
+
+gatikaColor = 
+[
+new ColorData (0xff3f00, new THREE.Color(255,63,0)),
+new ColorData (0x99cc00, new THREE.Color(153,204,0)),
+new ColorData (0x0066cc, new THREE.Color(0,102,204)),
+new ColorData (0x9966cc, new THREE.Color(153,102,204)),
+new ColorData (0x111122, new THREE.Color(17,17,34)),
+],
+
+tanColor = 
+[
+new ColorData (0xf4e6bf, new THREE.Color(244,230,191)),
+new ColorData (0xf4efcb, new THREE.Color(244,239,203)),
+new ColorData (0xf3ebb8, new THREE.Color(243,235,184)),
+new ColorData (0xfffae3, new THREE.Color(255,250,227)),
+new ColorData (0xfeffe7, new THREE.Color(254,255,231)),
+],
+
+looshColor = 
+[
+new ColorData (0x84cb61, new THREE.Color(132,203,97)),
+new ColorData (0x3b5b47, new THREE.Color(59,91,71)),
+new ColorData (0xd2f5c7, new THREE.Color(210,245,199)),
+new ColorData (0xd4c8a0, new THREE.Color(212,200,160)),
+new ColorData (0xc88650, new THREE.Color(200,134,80)),
+],
+
+takeoffColor = 
+[
+new ColorData (0xed78a6, new THREE.Color(237,120,166)),
+new ColorData (0xdd78a6, new THREE.Color(221,120,166)),
+new ColorData (0xcd78a6, new THREE.Color(205,120,166)),
+new ColorData (0xbd78a6, new THREE.Color(189,120,166)),
+new ColorData (0xad78a6, new THREE.Color(173,120,166)),
+],
+
+mawrsColor = 
+[
+new ColorData (0xf48a36, new THREE.Color(244,138,54)),
+new ColorData (0xc77d4e, new THREE.Color(199,125,78)),
+new ColorData (0xb6732f, new THREE.Color(182,115,47)),
+new ColorData (0x725130, new THREE.Color(114,81,48)),
+new ColorData (0xb49b63, new THREE.Color(180,155,99)),
+],
+
+voonisColor = 
+[
+new ColorData (0xf8e2b0, new THREE.Color(248,226,176)),
+new ColorData (0xeecb8b, new THREE.Color(238,203,139)),
+new ColorData (0xe3bb76, new THREE.Color(227,187,118)),
+new ColorData (0xd3a567, new THREE.Color(211,165,103)),
+new ColorData (0xad8d54, new THREE.Color(173,141,84)),
+],
+
+jupeetawrColor = 
+[
+new ColorData (0xb4a79e, new THREE.Color(180,167,158)),
+new ColorData (0xdcd0b8, new THREE.Color(220,208,184)),
+new ColorData (0xd1a77f, new THREE.Color(209,167,127)),
+new ColorData (0xe3dadf, new THREE.Color(227,218,223)),
+new ColorData (0xddb47e, new THREE.Color(221,180,126)),
+],
+
+RomanceColor = 
+[
+new ColorData (0xd66574, new THREE.Color(214,101,116)),
+new ColorData (0xf8838e, new THREE.Color(248,131,142)),
+new ColorData (0xbd597a, new THREE.Color(189,89,122)),
+new ColorData (0xd2738b, new THREE.Color(210,115,139)),
+new ColorData (0xaaaaaa, new THREE.Color(170,170,170)),
+],
+
+SpagettiosColor = 
+[
+new ColorData (0x296004, new THREE.Color(41,96,4)),
+new ColorData (0xff8400, new THREE.Color(255,132,0)),
+new ColorData (0x00aeff, new THREE.Color(0,174,255)),
+new ColorData (0xb92a0e, new THREE.Color(185,42,14)),
+new ColorData (0x7851A9, new THREE.Color(120,81,169)),
+],
+
+PotziclesColor = 
+[
+new ColorData (0x7a5594, new THREE.Color(122,85,148)),
+new ColorData (0xc5e0c9, new THREE.Color(197,224,201)),
+new ColorData (0x068fb6, new THREE.Color(6,143,182)),
+new ColorData (0x068fb6, new THREE.Color(6,143,182)),
+new ColorData (0x068fb6, new THREE.Color(6,143,182)),
+],
+
+DevomaColor = 
+[
+new ColorData (0x194041, new THREE.Color(25,64,65)),
+new ColorData (0x145759, new THREE.Color(20,87,89)),
+new ColorData (0x311459, new THREE.Color(49,20,89)),
+new ColorData (0x49395e, new THREE.Color(73,57,94)),
+new ColorData (0x848187, new THREE.Color(132,129,135)),
+],
+
+MonfuColor = 
+[
+new ColorData (0x412e19, new THREE.Color(65,46,25)),
+new ColorData (0x724c0a, new THREE.Color(114,76,10)),
+new ColorData (0x4e2d0a, new THREE.Color(78,45,10)),
+new ColorData (0x4a4e0a, new THREE.Color(74,78,10)),
+new ColorData (0x313405, new THREE.Color(49,52,5)),
+],
+
+iceBallsColor = 
+[
+new ColorData (0x2956a2, new THREE.Color(41,86,162)),
+new ColorData (0x64afb1, new THREE.Color(100,175,177)),
+new ColorData (0x5682cb, new THREE.Color(86,130,203)),
+new ColorData (0x9feff1, new THREE.Color(159,239,241)),
+new ColorData (0x3fbee2, new THREE.Color(63,190,226)),
+],
+
+PastalliiColor = 
+[
+new ColorData (0xf8ea00, new THREE.Color(248,234,0)),
+new ColorData (0xe16cb4, new THREE.Color(225,108,180)),
+new ColorData (0xffa811, new THREE.Color(255,168,17)),
+new ColorData (0x9DE656, new THREE.Color(157,230,86)),
+new ColorData (0x3fbfe2, new THREE.Color(63,191,226)),
+],
+
+spicyColors = 
+[
+new ColorData (0xff7e7e, new THREE.Color(255,126,126)),
+new ColorData (0xe3cb7f, new THREE.Color(227,203,127)),
+new ColorData (0xddea9a, new THREE.Color(221,234,154)),
+new ColorData (0xbfd279, new THREE.Color(191,210,121)),
+new ColorData (0xa4c783, new THREE.Color(164,199,131)),
+],
+
+saturateColors = 
+[
+new ColorData (0xeae72c, new THREE.Color(234,231,44)),
+new ColorData (0xff8400, new THREE.Color(255,132,0)),
+new ColorData (0xff0000, new THREE.Color(255,0,0)),
+new ColorData (0x8e44ad, new THREE.Color(142,68,173)),
+new ColorData (0x39d5ff, new THREE.Color(57,213,255)),
+],
+
+cruellaColors = 
+[
+new ColorData (0x54e0ec, new THREE.Color(84,224,236)),
+new ColorData (0xff00a7, new THREE.Color(255,0,167)),
+new ColorData (0x000000, new THREE.Color(0,0,0)),
+new ColorData (0xffffff, new THREE.Color(255,255,255)),
+new ColorData (0xcbebff, new THREE.Color(203,235,255)),
+],
+
+discoGrannyColors = 
+[
+new ColorData (0x54caf4, new THREE.Color(84,202,244)),
+new ColorData (0xf4702b, new THREE.Color(244,112,43)),
+new ColorData (0xf23d94, new THREE.Color(242,61,148)),
+new ColorData (0x557dc2, new THREE.Color(85,125,194)),
+new ColorData (0xacc042, new THREE.Color(172,192,66)),
+],
+
+emeraldSeaFoamColors = 
+[
+new ColorData (0x3fd860, new THREE.Color(63,216,96)),
+new ColorData (0x00ff85, new THREE.Color(0,255,133)),
+new ColorData (0x44c4df, new THREE.Color(68,196,223)),
+new ColorData (0x2db2d8, new THREE.Color(45,178,216)),
+new ColorData (0x1f4d90, new THREE.Color(31,77,144)),
+],
+
+miserableColors = 
+[
+new ColorData (0x9f9faa, new THREE.Color(159,159,170)),
+new ColorData (0x848592, new THREE.Color(132,133,146)),
+new ColorData (0x6b6f7e, new THREE.Color(107,111,126)),
+new ColorData (0x5e6171, new THREE.Color(94,97,113)),
+new ColorData (0x4f5465, new THREE.Color(79,84,101)),
+],
+
+domColors = 
+[
+new ColorData (0x8F00FF, new THREE.Color(143, 0, 255)),
+new ColorData (0xADFF2F, new THREE.Color(173,255,47)),
+new ColorData (0x0000FF, new THREE.Color(0, 0, 255)),
+new ColorData (0xffff00, new THREE.Color(255,255,0)),
+new ColorData (0xffffff, new THREE.Color(255,255,255)),
 ]
+
+
+
 
 ];
 

@@ -7,7 +7,9 @@
 
 		varying vec3 vecNormal;
 		varying vec3 vWorldPosition;
-		
+		uniform float ringLimits[5];
+		uniform float transparency[5];
+		uniform vec3 colors[5];
 		//Although looks random as fuck, its being parsed//recplaced with Shadow.glsl, 
 		//refer to mains callback async nested bumb 
 		AddShadow
@@ -31,24 +33,19 @@
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 
 		#endif
-
-		vec4 firstColor = vec4(1,0,0,1);
-		vec4 middleColor = vec4(1,1,0,1);
-		vec4 secondColor = vec4(0,1,0.4,1);
-
 		void main()
 		{
 
-				vec4 col;
+			vec4 col;
 
-				if(vUv.x >= 0.0)
-				col = (firstColor);
+			if(vUv.x >= 0.0)
+			col = vec4(colors[0].x /255.0,colors[0].y/255.0, colors[0].z/255.0, transparency[0]);
 
-				if(vUv.x <= 0.3 && vUv.x <= 0.3)
-				col = (middleColor);
+			if(vUv.x >= ringLimits[0])
+			col = vec4(colors[1].x/255.0 ,colors[1].y/255.0, colors[1].z/255.0, transparency[1]);
 
-				if(vUv.x <= 0.6 && vUv.x > 0.3)
-				col = (secondColor);
+			if(vUv.x >= ringLimits[1])
+			col = vec4(colors[2].x /255.0,colors[2].y/255.0, colors[2].z/255.0, transparency[2]);
 
 
 			vec4 ditherCol = vec4(dither(col.rgb), 1.0);
@@ -66,5 +63,5 @@
 
 			vec3 finalCol = col.rgb * ditherShadow.rgb;
 
-			gl_FragColor =  vec4(finalCol, 1.0) * vec4(color.r, color.g, color.b, 1.0);
+			gl_FragColor =  vec4(ditherShadow.rgb, 1.0) * vec4(col);
 		}

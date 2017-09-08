@@ -33,11 +33,8 @@ varying vec3 vWorldPosition;
 		#endif
 		void main()
 		{
-
-			vec3 lightDirection = normalize(directionalLights[0].direction - vWorldPosition);
-
-			vec3 sumDirLights = clamp( dot( directionalLights[0].direction, 
-			vecNormal ), 0.0, .75 ) * directionalLights[0].color  * 1.0;
+			vec3 sumDirLights = (clamp(dot(normalize(directionalLights[0].direction), 
+			vecNormal), 0.0, 0.8) * directionalLights[0].color) * 1.01;
 
 			float shadowValue = getShadow(directionalShadowMap[ 0 ], directionalLights[0].shadowMapSize, 
 			directionalLights[0].shadowBias, directionalLights[0].shadowRadius, vDirectionalShadowCoord[0] );
@@ -57,5 +54,5 @@ varying vec3 vWorldPosition;
 				color = texture2D(texture, vUv);
 			}
 			
-			gl_FragColor = (color) * (light * shadowDither);
+			gl_FragColor = (color) * (shadowDither) * vec4(light.rgb,1.0);
 		}

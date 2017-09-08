@@ -2,13 +2,46 @@ function regionRoll (isclouds)
 {
     if(!isclouds)
         {
-            var diceroll = Math.round((randomRange(0, 100)));
+            var diceroll = randomRange(0, 10);
 
             var NewRegion;
-            NewRegion = CreateRegion();;
+
+            if(diceroll <= 9)
+            NewRegion = CreateRegion();
+            else
+            {
+                var diceroll = randomRange(0, 10);
+                
+                if(diceroll <= 1)
+                {
+                    NewRegion = deadrock;
+                }
+                else if(diceroll <= 2)
+                {
+                    NewRegion = rock;
+                }
+                else if(diceroll <= 3)
+                {
+                    NewRegion = primordial;
+                }
+                else if(diceroll <= 4)
+                {
+                    NewRegion = frozen;
+                }
+                else if(diceroll <= 5)
+                {
+                    NewRegion = liqiud_mathane;
+                }
+                else
+                {
+                    NewRegion = lush;
+                   
+                }
+            }
+            //NewRegion = peepee;
         }
         else
-           NewRegion = cloud; 
+        NewRegion = cloud; 
     
   
     NewRegion.isGassy = SortGassyBools(NewRegion);
@@ -19,13 +52,12 @@ function regionRoll (isclouds)
 
 function CreateRegion()
 {
-    var numRegions = randomRange(5,5); // Expand later
-    var data = [];
     var colors = ColorPalletes[Math.round(randomRange(1, ColorPalletes.length -1))];
-
+    //var colors =  ColorPalletes[ColorPalletes.length -1];
+    var numRegions = randomRange(colors.length,colors.length); // Expand later
+    var data = [];
     var prevoisLevel;
     var currentLevel = randomRange(0.04, 0.3);
-
     for(var i = 0; i < numRegions; i++)
     {
         if(i == 0)
@@ -35,7 +67,7 @@ function CreateRegion()
         }
         else
         {
-            currentLevel = randomRange(prevoisLevel, prevoisLevel + randomRange(0.1, 0.3));
+            currentLevel = randomRange(prevoisLevel, prevoisLevel + randomRange(0.1, 0.5));
             prevoisLevel = currentLevel;
         }
         data.push
@@ -43,12 +75,22 @@ function CreateRegion()
             new TerrainType("base", currentLevel) //Water be here
         )
     }
-    //console.log(data);
-    
+
+    var roll = (randomRange(0, 10));
+
+    if(roll > 9.5)
+    {
+        colors[0] = ColorPalletes[Math.round(randomRange(1, ColorPalletes.length -1))][Math.round(randomRange(0, 4))];
+        colors[1] = ColorPalletes[Math.round(randomRange(1, ColorPalletes.length -1))][Math.round(randomRange(0, 4))];
+        colors[2] = ColorPalletes[Math.round(randomRange(1, ColorPalletes.length -1))][Math.round(randomRange(0, 4))];
+        colors[3] = ColorPalletes[Math.round(randomRange(1, ColorPalletes.length -1))][Math.round(randomRange(0, 4))];
+        colors[4] = ColorPalletes[Math.round(randomRange(1, ColorPalletes.length -1))][Math.round(randomRange(0, 4))];
+    }
+
     return new RegionInformation
     (
         colors , data ,
-        0, 0, true, "", 0
+        0, 0, true, "",  3, ''
     );
 }
 
@@ -61,7 +103,7 @@ function SortGassyBools(NewRegion)
         {
             var roll = randomRange(0, 10);
 
-            if(roll >= 6)
+            if(roll >= 8.5)
             {
                 bool = true;
             }
@@ -83,7 +125,8 @@ function SortGassyBools(NewRegion)
         return bool;
 }
 
-function RegionInformation(ColorPallette, Data, atmoSize, atmoThickness, hasLiquad, name, isGassy)
+function RegionInformation(ColorPallette, Data, atmoSize, atmoThickness, 
+                            hasLiquad, name, isGassy, customUrl)
 {
     this.ColorPallette = ColorPallette;
     this.Data = Data;
@@ -92,6 +135,7 @@ function RegionInformation(ColorPallette, Data, atmoSize, atmoThickness, hasLiqu
     this.hasLiquad = hasLiquad;
     this.name = name;
     this.isGassy = isGassy;
+    this.customUrl = customUrl;
 }
 
 
@@ -102,7 +146,7 @@ var cloud = new RegionInformation(
  new TerrainType("water deep", 0),
  new TerrainType("water shallow", 0.5)
 ], 
-0, 0, true, "cloud", 0
+0, 0, true, "cloud", 0, ''
 )
 ;
 
@@ -116,7 +160,7 @@ var lush = new RegionInformation(
  new TerrainType("grass", .6),
  new TerrainType("rocky", .75),
  new TerrainType("snowy", .83),
-], 0, 0, true, "lush", 0
+], 0, 0, true, "lush", 0, ''
 )
 ;
 
@@ -131,7 +175,7 @@ var rock = new RegionInformation(
  new TerrainType("grass", .6),
  new TerrainType("rocky", .75),
  new TerrainType("snowy", .83)
-], 0, 0, true, "rock", 0
+], 0, 0, true, "rock", 0, ''
 )
 ;
 
@@ -147,7 +191,7 @@ var primordial = new RegionInformation(
  new TerrainType("grass", .6),
  new TerrainType("rocky", .75),
  new TerrainType("snowy", .83),
-], 0, 0, true,"primordial", 0
+], 0, 0, true,"primordial", 0, ''
 )
 ;
 
@@ -162,7 +206,7 @@ var frozen = new RegionInformation(
  new TerrainType("water deep", .64),
  new TerrainType("water shallow", .75),
  new TerrainType("sand", .9),
-], 0, 0, true,"frozen", 3
+], 0, 0, true,"frozen", 3, ''
 )
 ;
 
@@ -184,7 +228,7 @@ new TerrainType("ring2", 0.625),
 new TerrainType("ring2", 0.65),
 new TerrainType("ring2", 0.675),
 new TerrainType("ring", 0.9),
-], 0, 0, true,"liqiud_mathane", 1
+], 0, 0, true,"liqiud_mathane", 1, ''
 )
 ;
 
@@ -198,7 +242,28 @@ var deadrock =  new RegionInformation(
  new TerrainType("rocky", .75),
  new TerrainType("grass", .77),
  new TerrainType("rocky", .9),
-],
-0, 0, true,"deadrock", 0
+], 0, 0, true,"deadrock", 0, ''
 )
 ;
+
+var lovePatch =  new RegionInformation(
+    ColorPalletes[ColorPalletes.length - 7],
+[
+ new TerrainType("water deep", 0),
+ new TerrainType("water shallow", 0.1),
+ new TerrainType("sand", .53),
+ new TerrainType("water shallow", 0.6),
+ new TerrainType("rocky", 0.7),
+], 0, 0, true,"deadrock", 0,  'img/Maps/12670-bump.jpg'
+);
+
+var peepee =  new RegionInformation(
+    ColorPalletes[ColorPalletes.length - 30],
+[
+ new TerrainType("water deep", 0),
+ new TerrainType("water shallow", 0.1),
+ new TerrainType("sand", .53),
+ new TerrainType("water shallow", 0.6),
+ new TerrainType("rocky", 0.7),
+], 0, 0, true,"deadrock", 0,  'img/Maps/poonus_map.png'
+);

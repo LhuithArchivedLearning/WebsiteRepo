@@ -18,11 +18,11 @@
 				float x = (mod(gl_FragCoord.x, 8.0));
 				float y = (mod(gl_FragCoord.y, 8.0));
 				
-				float grabby = 1.0;
+				float grabby = 2.0;
 				
 				for(int i = 0; i < 64; i++)
 				{
-					if(i == int(x + y * 8.0))
+					if(i == int(x + (y * 8.0)))
 					{
 						grabby = indexMatrix16x16[i];
 						break;
@@ -34,7 +34,7 @@
 
 			float ditherMap(float color) 
 			{
-			float closestColor = (color < 0.5) ? 0.0 : 1.0;
+			float closestColor = (color <= 0.5) ? 0.0 : 1.0;
 			float secondClosestColor = 1.0 - closestColor;
 			float d = indexValue();
 			float distance = abs(closestColor - color);

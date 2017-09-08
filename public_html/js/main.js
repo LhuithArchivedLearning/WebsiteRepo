@@ -1,5 +1,5 @@
    
-	var container, stats, resolution, map, controls, lineUI, gui;
+	var container, stats, resolution, controls, lineUI, gui;
     var camera, MainScene, BackgroundScene, renderer, clock, composer;
     var lightpos, dirLight, angle;
 
@@ -15,15 +15,96 @@
     var textureSize = 256;
     var mouseDown = false;
     var boxsize = 25;
-    var planetSize, planetData, inPlanet, planet, planetText, atmoMaterial, planetTilt, hasRings, 
-    PlanetMaterial, moonList, ringsList, outline, atmo, clouds, planetGeo, planetRotationPeriod;
-    var ShaderDataInfo = {vs:'', fs : ''};
     var skyboxuniforms;
+    var planetSize, planetData, inPlanet, planet, 
+    planetText, planetTextInfo, atmoMaterial, planetTilt, hasRings, 
+    PlanetMaterial, moonList, ringsList, outline, 
+    atmo, clouds, planetRotationPeriod;
 
+    var selectionBox;
+    
+    var astroidSprites = [], AstoColorPalleteGrab;
+    var moonGeom, sphereGeom;
+    var timer = 0;
+    var timeLimit = .25;
     var startTime = Date.now();
     
+
+var atmouniforms = 
+   { 
+       fresnelExp :{ type: "f", value: 0},
+       transitionWidth:{ type: "f", value: 0.1},
+       atmoThickness:{ type: "f", value: 0},    
+       indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
+       palette:{type:"v3v", value: GrayScalePallete},
+       paletteSize:{type:"i", value: 8},
+       colorlight:{type: "v3", value: 0},
+   }
+
+    var skyboxuniforms =
+    {
+        resolution: { type: "v2", value: new THREE.Vector2() },
+        randomColsMults: { type: "v3", 
+        value: new THREE.Vector3(
+            randomRange(0,10), 
+            randomRange(0,10),
+            randomRange(0,10)) },
+        time:{type: "f", value:1.0}            
+    }
+
+    var planetUniform =
+    {
+            indexMatrix16x16:{ type: "fv1" , value: DitherPattern2},
+            palette:{type:"v3v", value: GrayScalePallete},
+            paletteSize:{type:"i", value:8},
+            texture: { type: "t", value: null },
+            lightpos: {type: 'v3', value: new THREE.Vector3(0,30,20) },
+            noTexture:{type:"i", value: 0}
+    };
+
+    var ringUniform =
+    { 
+            color: { type: "vf3", value: new THREE.Vector3(1,1,1)},
+            side: THREE.DoubleSide,
+            indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
+            palette:{type:"v3v", value: GrayScalePallete},
+            paletteSize:{type:"i", value:8},
+            colors : {type:"v3v", value:  0},
+            ringLimits : {type:"fv1", value: 0},
+            transparency : {type:"fv1", value: 0}
+    };
+
+    var ShaderLoadList = 
+    {
+        planet : new Shader
+        (
+        ),
+
+        atmo : new Shader
+        (
+        ),
+
+        asto : new Shader
+        (
+        ),
+
+        ring : new Shader
+        (
+        ),
+
+        cloud : new Shader
+        (
+        ),
+    }
+
     init();
     animate();
+
+    function Shader(vertex, fragment)
+    {
+        this.vertex = vertex;
+        this.fragment = fragment;
+    }
 
     //Yummy Yum Yum
     function textParse(glsl, shadow_text, dither_text) 
@@ -38,7 +119,6 @@
     {    
         MainScene = new THREE.Scene();
         BackgroundScene = new THREE.Scene();
-
         camera = new THREE.OrthographicCamera(  window.innerWidth / - 2,  window.innerWidth / 2, 
                                                 window.innerHeight /  2,  window.innerHeight / - 2, - 500, 1000 );
         camera.position.x = 0;
@@ -64,21 +144,11 @@
         renderer.shadowMap.renderSingleSided = false;
 
         clock = new THREE.Clock();
-    
-
-        //Load Shaders and Setup Planet
-        ShaderLoader('js/Shaders/DitherLight/DitherLightShader.vs.glsl', 
-        'js/Shaders/DitherLight/DitherLightShader.fs.glsl', setUpPlanet, true); 
-        
-        //Load Shaders and Setup SkyBox
-        ShaderLoader('js/Shaders/Skybox/SkyBox.vs.glsl', 
-                     'js/Shaders/Skybox/SkyBox.fs.glsl', setUpSky, true); 
-
 
         lineUI = CreateUI(new THREE.Vector3(250,-200,0));
-
         MainScene.add(lineUI);
 
+        
         //Add Controls
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         //controls.minZoom = 0.5;
@@ -86,7 +156,7 @@
 
         
         dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        var vector = new THREE.Vector3(1000,1000,750);
+        var vector = new THREE.Vector3(750,500,1000);
         dirLight.position.set(vector);
 
         dirLight.shadow.camera.near	= 0.01;		
@@ -102,7 +172,7 @@
         dirLight.shadow.mapSize.width = 512;
         dirLight.shadow.mapSize.height = 512;
 
-        dirLight.shadow.camera.far = 1500;
+        dirLight.shadow.camera.far = 2500;
         dirLight.shadow.bias = -0.01;
   
         var shadowCam = new THREE.CameraHelper( dirLight.shadow.camera );
@@ -160,13 +230,44 @@
         gui.add(controls, 'xPos', -1000, 1000);
         gui.add(controls, 'yPos', -1000, 1000);
         gui.add(controls, 'zPos', -1000, 1000);
+        dat.GUI.toggleHide();
 
-        var col = new THREE.Vector3(255,255,255);
-        col = shadeRGBColor(col, -.5);
+        LoadAssets();
+        //Load Shaders and Setup Planet
+        ShaderLoader('js/Shaders/Planet/Planet.vs.glsl', 
+        'js/Shaders/Planet/Planet.fs.glsl', setUpPlanet, true); 
+        
+        //Load Shaders and Setup SkyBox
+        ShaderLoader('js/Shaders/Skybox/SkyBox.vs.glsl', 
+                        'js/Shaders/Skybox/SkyBox.fs.glsl', setUpSky, true); 
+        
+    }
 
-        var hexCol = "#ffffff";
-        hexCol = shadeHEXColor(hexCol.toString(), -0.5);
-        console.log(hexCol)
+
+    function LoadAssets()
+    {      
+        var texterLoader =  new THREE.TextureLoader();
+        
+        var spriteMap01 = texterLoader.load( "img/astoriod_01.png" );
+        var spriteMap02 = texterLoader.load( "img/astoriod_02.png" );
+        var spriteMap03 = texterLoader.load( "img/astoriod_03.png" );
+        var spriteMap04 = texterLoader.load( "img/astoriod_04.png" );
+        var spriteMap05 = texterLoader.load( "img/astoriod_05.png" );
+    
+        astroidSprites = [spriteMap01, spriteMap02, spriteMap03, spriteMap04, spriteMap05];
+    
+        spriteMap01.magFilter = THREE.NearestFilter;
+        spriteMap01.minFilter = THREE.NearestFilter;  
+        spriteMap02.magFilter = THREE.NearestFilter;
+        spriteMap02.minFilter = THREE.NearestFilter;
+        spriteMap03.magFilter = THREE.NearestFilter;
+        spriteMap03.minFilter = THREE.NearestFilter; 
+        spriteMap04.magFilter = THREE.NearestFilter;
+        spriteMap04.minFilter = THREE.NearestFilter;  
+        spriteMap05.magFilter = THREE.NearestFilter;
+        spriteMap05.minFilter = THREE.NearestFilter;
+
+        //AstPalleteColorGrab = AstoColorPalleteGrab[randomRangeRound(0, AstoColorPalleteGrab.length - 1)].RGB;
     }
 
     function onWindowResize()
@@ -188,25 +289,46 @@
     function animate()
     {
         var delta = clock.getDelta(); 
+        
+        timer = timer + delta;
 
-        angle += 0.01;
+        if(timer >= timeLimit)
+        {
+           // if(ShaderLoadList.planet.vertex == undefined)
+           // {
+           //     ShaderLoader('js/Shaders/Planet/Planet.vs.glsl', 
+           //     'js/Shaders/Planet/Planet.fs.glsl', setUpPlanet, false); 
+           // }
+           // else
+           // {
+           //     createPlanet(false, ShaderLoadList.planet.vertex, ShaderLoadList.planet.fragment);
+           // }
+
+            timer = 0;
+        }
+
+        angle += 0.1;
         dirLight.position.set(controls.xPos, controls.yPos, controls.zPos);
+        dirLight.rotation.x += angle;
+        dirLight.rotation.y += angle;
 
         if(planet !== undefined)
         {
+     
             var elapsedMilliseconds = Date.now() - startTime;
             var elapsedSeconds = elapsedMilliseconds / 1000.;
 
             if( skyboxuniforms !== undefined)
             skyboxuniforms.time.value = 60. * elapsedSeconds;
-            
             PlanetRotation(planet, planetRotationPeriod, planetTilt, delta);
-            planetText.updatePosition(planetSize, true);
-            MoonsUpdate(clock.getDelta());
-            
-                if(clouds !== undefined)
+
+            planetText.updatePosition(planetSize, - planetText.element.clientWidth/2);
+           
+            if(clouds !== undefined)
             PlanetRotation(clouds, planetRotationPeriod*4, planetTilt, delta);;
         }
+
+        MoonsUpdate(clock.getDelta());
         requestAnimationFrame(animate);
 
         //ShowHideOutline();
@@ -215,17 +337,16 @@
         render();
     }
 
-
     function HandleCursor()
     {
-        if (inPlanet) 
-        {
-        $('html,body').css('cursor', 'pointer');
-        }
-        else
-        {
-        $('html,body').css('cursor', 'default');
-        }
+       // if (inPlanet) 
+       // {
+       // $('html,body').css('cursor', 'pointer');
+       // }
+       // else
+       // {
+       // $('html,body').css('cursor', 'default');
+       // }
     }
 
     function MoonsUpdate(delta)
@@ -236,29 +357,28 @@
             {
                 if (ringsList !== undefined)
                 {
+   
                     for(var i = 0; i < ringsList.length; i++)
                     {
-                        RingOrbit(ringsList[i], ringsList[i].Ring, planet, 
+                        RingOrbit(ringsList[i], ringsList[i].Ring, new THREE.Vector3(0,0,0), 
                         clock.getElapsedTime(), 1000, 24, delta * 42); 
                     
                     }
                 }
             }
         
-        if(moonList.length != 0)
+        if(moonList !== undefined)
         {
             for(var i = 0; i < moonList.length; i++)
-            { 
-                if (moonList[i] !== undefined)
-                {                       
-                    moonList[i].text.updatePosition(moonList[i].moonSize);
+            {                      
+                    moonList[i].text.updatePosition(moonList[i].moonSize,  - planetText.element.clientWidth/2);
+                    
                     orbit(moonList[i], moonList[i].moonObject, 
-                    planet, clock.getElapsedTime() * moonList[i].orbitSpeedMult, 
+                    new THREE.Vector3(0,0,0), clock.getElapsedTime() * moonList[i].orbitSpeedMult, 
                     1000, delta/12);
                     moonList[i].material.uniforms.lightpos.value.copy (dirLight.position);
                     ShowHideOrbitPath(moonList[i], moonList[i].moonOrbit);                      
-                }       
-            }
+            }       
         }
     }
 
@@ -427,7 +547,6 @@
             x: vector.x,
             y: vector.y
         };
-
     };
 
     // Follows the mouse event
@@ -458,8 +577,17 @@
             switch ( event.button ) 
             {
             case 0: // left
-                ShaderLoader('js/Shaders/DitherLight/DitherLightShader.vs.glsl', 
-                'js/Shaders/DitherLight/DitherLightShader.fs.glsl', setUpPlanet, false); 
+
+                if(ShaderLoadList.planet.vertex == undefined)
+                {
+                    ShaderLoader('js/Shaders/Planet/Planet.vs.glsl', 
+                    'js/Shaders/Planet/Planet.fs.glsl', setUpPlanet, false); 
+                }
+                else
+                {
+                    createPlanet(false, ShaderLoadList.planet.vertex, ShaderLoadList.planet.fragment);
+                }
+
                 break;
             case 1: // middle
                 break;
@@ -478,35 +606,50 @@
         lacunarity = randomRange(1.9, 2.2);
         octaves = Math.round(randomRange(4,6));
         noiseScale = randomRange(10, 200);
-        planetSize = randomRange(40, 125);
         moonList = new Array(Math.round(randomRange(1, 4)));
         planetTilt = randomRange(-55, 55);
+        planetSize = randomRange(40, 125);
         planetRotationPeriod = Math.round(randomRange(65, 100));
-     
         InitializeMoonData(moonList, vertex_text, fragment_text);
     }
 
     function setUpRings(colors, vertex_text, fragment_text)
     {
-        ringsList = new Array(Math.round(randomRange(1,5)));
+
+        ShaderLoadList.asto.vertex = vertex_text;
+        ShaderLoadList.asto.fragment = fragment_text;
+
+        ringsList = new Array(Math.round(randomRange(1,4)));
+
+        var index = randomRangeRound(1, ColorPalletes.length - 1);
+        AstoColorPalleteGrab =  ColorPalletes[index];
 
         InitializeRingsData(ringsList); 
-        
+                
         if (ringsList !== undefined)
         {
             for(var i = 0; i < ringsList.length; i++)
             {
+
                     if(!ringsList[i].isFlat)
                     {
-                        CreateRockyBelt(ringsList[i], planet,clock.getElapsedTime(), 
+                        CreateRockyBelt(ringsList[i], new THREE.Vector3(0,0,0) ,clock.getElapsedTime(), 
                                                     1000, ringsList[i].NumAstros, ringsList[i].Ring, 
                                                     vertex_text, fragment_text, dirLight.position, 
-                                                    ringsList[i].astoList, colors);   
+                                                    ringsList[i].astoList, AstoColorPalleteGrab);   
                     }
                     else
                     {
+                        if(ShaderLoadList.ring.vertex == undefined)
+                        {
                         ShaderLoader('js/Shaders/Ring/Ring.vs.glsl', 
-                        'js/Shaders/Ring/Ring.fs.glsl', SetUpFlatBelt, {data: ringsList[i], scene : MainScene}); 
+                        'js/Shaders/Ring/Ring.fs.glsl', SetUpFlatBelt, {data: ringsList[i], Ringcolors : AstoColorPalleteGrab});
+                        }
+                        else
+                        {
+                            CreateFlatBelt({data: ringsList[i], Ringcolors : AstoColorPalleteGrab}, 
+                                ShaderLoadList.ring.vertex, ShaderLoadList.ring.fragment);
+                        }
                     }
 
                     MainScene.add(ringsList[i].Ring);      
@@ -515,37 +658,54 @@
         
     }
 
-
     function CreateFlatBelt(ringData, vertex_text, fragment_text)
     {
-      
-        var ringGeo = new RingGeoCreate(ringData,  ringData.Ring, 1000);
-    
-            var uniform =
-            {
-                    color: { type: "vf3", value: new THREE.Vector3(1,1,1)},
-                    side: THREE.DoubleSide,
-                    indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
-                    palette:{type:"v3v", value: GrayScalePallete},
-                    paletteSize:{type:"i", value:8},
-            };
-    
-           // console.log(THREE.UniformsLib['lights']);
-    
+        var ringGeo = new RingGeoCreate(ringData.data, ringData.data.Ring, 1000);
+        var ringLimits = new Array(5);
+        var transparency = new Array(5);
+        
+        ringLimits[0] = randomRange(0.01, 0.5);
+        ringLimits[1] = randomRange(ringLimits[0], 0.6);
+        ringLimits[2] = randomRange(ringLimits[1], 0.9);
+
+        var colorsRGB = [];
+        
+        for(var j = 0; j < ringData.Ringcolors.length; j++)
+        {
+            var R = ringData.Ringcolors[j].RGB.r;
+            var G = ringData.Ringcolors[j].RGB.g;
+            var B = ringData.Ringcolors[j].RGB.b;
+
+            var normalColors = new THREE.Vector3(R, G, B);
+            colorsRGB.push(normalColors);
+        }
+
+        for(var i = 0; i < 5; i++)
+        {
+            transparency[i] = randomRange(0.1, 1.0);
+        }
+
+            ringUniform.colors.value = colorsRGB;
+            ringUniform.ringLimits.value = ringLimits;
+            ringUniform.transparency.value = transparency;
+
             ringMaterial = new THREE.ShaderMaterial
             ({
             uniforms: THREE.UniformsUtils.merge([
-                THREE.UniformsLib['lights'], uniform ]),
-            vertexShader: textParse(vertex_text),
-            fragmentShader: textParse(fragment_text),
+                THREE.UniformsLib['lights'],
+                 ringUniform ]),
+            vertexShader: (vertex_text),
+            fragmentShader: (fragment_text),
             lights: true,
             transparent : true
             });
             ringMaterial.side = THREE.DoubleSide;
 
         var newRing = new THREE.Mesh( ringGeo, ringMaterial );
+        newRing.castShadow = true;
+        newRing.receiveShadow = true;
 
-        ringData.Ring.add(newRing);
+        ringData.data.Ring.add(newRing);
     }
 
     function InitializeRingsData(ringsList)
@@ -565,26 +725,33 @@
             else
             flat = true;
 
-
-
             if(i == 0)
             {
-                        orbitrangeInner = randomRange((planetSize/1000) * 1.1, (planetSize/1000) * 1.2);
-                        orbitrangeOutter = randomRange(orbitrangeInner * 1.1, orbitrangeInner * 1.2);
+                orbitrangeInner = randomRange((planetSize/1000) * 1.1, (planetSize/1000) * 1.2);
+                orbitrangeOutter = randomRange(orbitrangeInner * 1.05, orbitrangeInner * 1.15);
             }
-            else if(i > 1)
+            else if(i >= 1)
             {
-                    orbitrangeInner = randomRange((ringsList[i - 1].a1), (ringsList[i - 1].a1) * 1.15);
-                    orbitrangeOutter = randomRange(orbitrangeInner * 1.1, orbitrangeInner * 1.11);
+                orbitrangeInner = randomRange((ringsList[i - 1].a1), (ringsList[i - 1].a1) * 1.15);
+                orbitrangeOutter = randomRange(orbitrangeInner * 1.05, orbitrangeInner * 1.15);
             }
 
-            NumAstros =  randomRange(36, 42);
-            orbitspeed = randomRange(-100, 100);
-            orbitspeed = (orbitspeed == 0) ? 1 : orbitspeed;
 
-            per = randomRange(randomRange(-10, -5), randomRange(5, 10));
-            per = (per == 0) ? 1 : orbitspeed;
+            var roll = Math.round(randomRange(0, 1));
+            NumAstros =  randomRange(36, 52);
 
+            per = randomRange(1, 25);
+            if(roll <= 0)
+            {
+                orbitspeed = randomRange(5, 20);
+                per = (per == 0) ? 1 : orbitspeed;
+            }
+            else
+            {
+                orbitspeed = randomRange(-5, -20);
+                per = (per == 0) ? 1 : orbitspeed;
+            }
+            
             var mat;
 
             ringsList[i] =
@@ -604,29 +771,29 @@
         for(var i = 0; i < moonList.length; i++)
         {
 
-        var roll = randomRange(0,10);
-        
-        var mat;
-        size =  randomRange(1, Math.round(planetSize/4));
-        orbitspeed = randomRange(-2, 2);
-        orbitspeed = (orbitspeed == 0) ? 1 : orbitspeed;
+            var roll = randomRange(0,10);
+            
+            var mat;
+            size =  randomRange(1, Math.round(planetSize/4));
+            orbitspeed = randomRange(-2, 2);
+            orbitspeed = (orbitspeed == 0) ? 1 : orbitspeed;
 
-        if(roll > 2.2)
-            {
-                
+
             moonData = createPlantiodData(octaves, persistance, lacunarity, 
             seed, 128, offset, 24);
             
-            var uniform = createUniforms(moonData.map);
-
             moonMaterial =  new THREE.ShaderMaterial ({
             uniforms: THREE.UniformsUtils.merge([
             THREE.UniformsLib['lights'], 
-            uniform]),
+            planetUniform]),
             vertexShader: vertex_text,
             fragmentShader: fragment_text,
             lights : true  
             });
+
+
+            if(roll > 2.2)
+            {
 
             moonMaterial.uniforms.texture.value = moonData.map;
             mat = moonMaterial;
@@ -634,20 +801,7 @@
             }
             else
             { 
-
-            var uniform = createUniforms(null);
-
-            moonMaterial = new THREE.ShaderMaterial ({
-            uniforms: THREE.UniformsUtils.merge([
-            THREE.UniformsLib['lights'], 
-            uniform]),
-            vertexShader: vertex_text,
-            fragmentShader: fragment_text,
-            lights : true  
-            });
-
-                moonMaterial.uniforms.texture.value = null;
-                moonMaterial.uniforms.texture.value = null;
+                moonMaterial.uniforms.noTexture.value = 1;
                 mat = moonMaterial;
             }
 
@@ -706,6 +860,7 @@
 
         return UI;
     }
+
     function setUpSky(start, vertex_text, fragment_text)
     {
         skyboxuniforms =
@@ -739,29 +894,30 @@
       
     }
 
-    function createAtmos(atmoInfo,vertex_text, fragment_text)
+    function createAtmos(colors, vertex_text, fragment_text)
     {
-         var loader = new THREE.TextureLoader();
-         var img = loader.load( "img/gradient-value-equalised2.png");
+        var colorsRGBLight = [];
 
-         //Max AtmoThickness before wierd shit starts is 1.2 or close to that 
-        var myuniforms = 
-        { 
-            Gradient: { type: 't', value: null},
-            fresnelExp :{ type: "f", value: 5.3},
-            transitionWidth:{ type: "f", value: 0.1},
-            atmoThickness:{ type: "f", value: 1.0},    
-            indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
-            palette:{type:"v3v", value: GrayScalePallete},
-            paletteSize:{type:"i", value: 8},
+        for(var j = 0; j < colors.length; j++)
+        {
+            var R = colors[j].RGB.r;
+            var G = colors[j].RGB.g;
+            var B = colors[j].RGB.b;
+
+            var normalColors = new THREE.Vector3(R, G, B);
+            colorsRGBLight.push(shadeRGBColor(normalColors, randomRange(0, 1.0)));
         }
+
+         atmouniforms.fresnelExp.value =  randomRange(0.8, 40.0);
+         atmouniforms.atmoThickness.value = randomRange(0.3, 1.2);
+         atmouniforms.colorlight.value =  colorsRGBLight[randomRangeRound(0, colorsRGBLight.length - 1)];
 
         atmoMaterial = new THREE.ShaderMaterial 
         ({
             uniforms: THREE.UniformsUtils.merge
             ([
             THREE.UniformsLib['lights'], 
-            myuniforms 
+            atmouniforms 
             ]),
                 vertexShader: vertex_text,
                 fragmentShader: fragment_text,
@@ -769,47 +925,80 @@
                 lights : true
             }   
         );
-
-        atmoMaterial.uniforms.Gradient.value = img;
-        
-        atmo = new THREE.Mesh(planetGeo, atmoMaterial);
+     
+        atmo = new THREE.Mesh(new THREE.IcosahedronGeometry(planetSize * 1.07, 4), atmoMaterial);
         atmo.position.set(0, 0, 0);//= planet.position;
-        atmo.scale.multiplyScalar(1.05);
-
         atmo.castShadow = false;
         atmo.receiveShadow = false;
         
         MainScene.add( atmo );
     }
 
+
+    function RemoveOldShizz()
+    {
+        if(planet !== undefined)
+        {
+            doDispose(planet);
+            MainScene.remove(planet);
+        }
+         if(outline !== undefined)
+        {
+        MainScene.remove(outline);
+        }
+        if(atmo !== undefined)
+        {
+        MainScene.remove(atmo);
+        doDispose(atmo);
+        }
+         if(clouds !== undefined)
+        {
+        MainScene.remove(clouds);
+        }
+        //doDispose(clouds);
+        planetText.element.remove();
+        planetTextInfo.element.remove();
+
+        for(var i = 0; i < moonList.length; i++)
+        {   
+            moonList[i].text.element.remove();
+            MainScene.remove(moonList[i].moonObject);
+            MainScene.remove(moonList[i].moonOrbit);
+            doDispose(moonList[i].moonObject);
+            doDispose(moonList[i].moonOrbit);
+        }
+        
+        if(hasRings)
+        {
+            for(var i = 0; i < ringsList.length; i++)
+            {   
+                MainScene.remove(ringsList[i].orbitObject);
+                MainScene.remove(ringsList[i].Ring);
+                doDispose(ringsList[i].Ring);
+            }
+        }
+    }
+
     function createPlanet(start, vertex_text, fragment_text)
     {
         if(planet !== undefined)
         {
-            MainScene.remove(planet);
-            MainScene.remove(outline);
-            MainScene.remove(atmo);
-            MainScene.remove(clouds);
-            planetText.element.remove();
-           
-            for(var i = 0; i < moonList.length; i++)
-            {   
-                moonList[i].text.element.remove();
-                MainScene.remove(moonList[i].moonObject);
-                MainScene.remove(moonList[i].moonOrbit);
-            }
+            RemoveOldShizz();
+        }
+        else
+        {
+            var vertex = vertex_text;
+            var fragment = fragment_text;
+            var ico = new THREE.IcosahedronGeometry(planetSize, 4);
             
-            if(hasRings)
-                {
-                    if (ringsList !== undefined)
-                    {
-                        for(var i = 0; i < ringsList.length; i++)
-                        {   
-                            MainScene.remove(ringsList[i].orbitObject);
-                            MainScene.remove(ringsList[i].Ring);
-                        }
-                    }
-                }
+            PlanetMaterial = new THREE.ShaderMaterial ({
+                uniforms: THREE.UniformsUtils.merge([
+                THREE.UniformsLib['lights'], 
+                planetUniform ]),
+                vertexShader: (vertex),
+                fragmentShader: (fragment),
+                lights : true           
+            });
         }
 
         CalculateParametres(vertex_text, fragment_text);
@@ -817,72 +1006,120 @@
         planetData = createPlantiodData(octaves, persistance, lacunarity, 
             seed, noiseScale, offset, textureSize);
 
-        var vertex = vertex_text;
-        var fragment = fragment_text;
 
-        var uniform = createUniforms(planetData.map);
+        //Custom image mapping addtion
+        //maybe find a smarter way to do this :s
+        //regions, url, size, planet, vertex_text, fragment_text
+        var cube = new THREE.CubeGeometry( 200, 200, 200 );
+        var ico = new THREE.IcosahedronGeometry(planetSize, 4);
 
-         PlanetMaterial = new THREE.ShaderMaterial ({
-            uniforms: THREE.UniformsUtils.merge([
-            THREE.UniformsLib['lights'], 
-            uniform ]),
-            vertexShader: textParse(vertex),
-            fragmentShader: textParse(fragment),
-            lights : true           
-        });
-
-        PlanetMaterial.uniforms.texture.value = planetData.map;
-
-        // instantiate a loader
-        var loader = new THREE.TextureLoader();
-
-        loader.crossOrigin = '';
-
-        planetGeo = new THREE.SphereGeometry(planetSize, 32, 32 );
-        planet = new THREE.Mesh( planetGeo, PlanetMaterial );
+        planet = new THREE.Mesh(cube, 
+        PlanetMaterial );
         planet.castShadow = true; //default is false
         planet.receiveShadow = true; //default
 
-        MainScene.add(planet);
-        
-        planetText = generateName(planet);
 
-        ShaderLoader('js/Shaders/Atmo/AtmoShader.vs.glsl', 
-        'js/Shaders/Atmo/AtmoShader.fs.glsl', setUpAtmosphere, true); 
-
-       for(var i = 0; i < moonList.length; i++)
+        if(planetData.url == '')
         {
-        moonList[i].moonOrbit = DrawOrbit(moonList[i], planet, clock.getElapsedTime(), 1000);
-        MainScene.add(moonList[i].moonObject);
-
-        if(moonList[i].moonOrbit != 0)
-        MainScene.add(moonList[i].moonOrbit);
-
-        moonList[i].text = generateName(moonList[i].moonObject);
-        }  
-        
-        var roll = randomRange(0, 10);
-
-        if(roll >= 6)
-        {
-            hasRings = true;
-        ShaderLoader('js/Shaders/Asto/Asto.vs.glsl', 
-        'js/Shaders/Asto/Asto.fs.glsl', setUpRings, planetData.colors); 
+            planet = new THREE.Mesh(ico, 
+            PlanetMaterial );
+            planet.castShadow = true; //default is false
+            planet.receiveShadow = true; //default
+            MainScene.add(planet);
+            
+            PlanetMaterial.uniforms.texture.value = planetData.map;            
         }
         else
         {
-            hasRings = false;
+        var customData = {region: planetData.regionsInfo, size : textureSize, mat : PlanetMaterial,
+        vert : vertex_text, frag : fragment_text};
+        CustomTextureLoader(planetData.url, customData, SetupTextureFunction);
         }
 
-        ShaderLoader('js/Shaders/Cloud/Cloud.vs.glsl', 
-        'js/Shaders/Cloud/Cloud.fs.glsl', setUpClouds, 1.1); 
+        //planetData.regionsInfo, planetData.url, 
+        //textureSize, planet, vertex_text, fragment_text
 
+        planetText = generateName(planet, "35px", -1000, false);
 
+        planetTextInfo = generateName(planet, "30px", -1000, true);
+        planetTextInfo.setWidthbyPercent(70);
+        planetTextInfo.setHeight(planetSize);
+
+        if(ShaderLoadList.atmo.vertex == undefined)
+        {
+        ShaderLoader('js/Shaders/Atmo/AtmoShader.vs.glsl', 
+        'js/Shaders/Atmo/AtmoShader.fs.glsl', setUpAtmosphere, planetData.colors); 
+        }
+        else
+        {
+            createAtmos(planetData.colors, ShaderLoadList.atmo.vertex , ShaderLoadList.atmo.fragment );
+        }
+        
+        for(var i = 0; i < moonList.length; i++)
+            {
+                moonList[i].moonOrbit = DrawOrbit(moonList[i], new THREE.Vector3(0,0,0), clock.getElapsedTime(), 1000);
+                MainScene.add(moonList[i].moonObject);
+
+                if(moonList[i].moonOrbit != 0)
+                MainScene.add(moonList[i].moonOrbit);
+
+                moonList[i].text = generateName(moonList[i].moonObject, "35px", -1000, false);// generateName(planet, "35px", -1000);
+            }  
+            
+            var roll = randomRange(0, 10);
+
+            if(roll >= 5)
+            {
+                    hasRings = true;
+
+                    if(ShaderLoadList.asto.vertex == undefined)
+                    {
+                    ShaderLoader('js/Shaders/Asto/Asto.vs.glsl', 
+                    'js/Shaders/Asto/Asto.fs.glsl', setUpRings, planetData.colors); 
+                    }
+                    else
+                    {
+                        setUpRings(planetData.colors, ShaderLoadList.asto.vertex, ShaderLoadList.asto.fragment);
+                    }
+            }
+            else
+            {
+                    hasRings = false;
+            }
+
+       //ShaderLoader('js/Shaders/Cloud/Cloud.vs.glsl', 
+       //'js/Shaders/Cloud/Cloud.fs.glsl', setUpClouds, 1.1); 
     }
+
+    function doDispose (obj)
+    {
+        if (obj !== null)
+        {
+            for (var i = 0; i < obj.children.length; i++)
+            {
+                doDispose(obj.children[i]);
+            }
+            if (obj.geometry)
+            {
+                obj.geometry.dispose();
+                obj.geometry = undefined;
+            }
+            if (obj.material)
+            {
+                if (obj.material.map)
+                {
+                    obj.material.map.dispose();
+                    obj.material.map = undefined;
+                }
+                obj.material.dispose();
+                obj.material = undefined;
+            }
+        }
+        obj = undefined;
+    };
 
     function createClouds(cloudsizeMult, vertex_text, fragment_text)
     {
-
        var cloudOctaves = 2;
        var cloudpersistance = .02;
        var cloudlacunarity = 1;
@@ -904,8 +1141,8 @@
             uniforms: THREE.UniformsUtils.merge([
             THREE.UniformsLib['lights'], 
             uniform ]),
-            vertexShader: textParse(vertex),
-            fragmentShader: textParse(fragment),
+            vertexShader: (vertex),
+            fragmentShader: (fragment),
             lights : true,
         
         });
@@ -914,7 +1151,7 @@
 
         cloudsGeo = new THREE.SphereGeometry(planetSize, 32, 32 );
         clouds = new THREE.Mesh( cloudsGeo, CloudsMaterial );
-        clouds.scale.multiplyScalar(1.1);
+        clouds.scale.multiplyScalar(1.0);
         //clouds.castShadow = true; //default is false
         clouds.receiveShadow = true; //default
 
@@ -923,24 +1160,29 @@
 
     function createMoon(moonSize, mat)
     {         
-        var moon = new THREE.Mesh( new THREE.SphereGeometry(moonSize, 12,  Math.PI * 2 ), mat );
-        
+        var moon = new THREE.Mesh(new THREE.IcosahedronGeometry(moonSize, 2), mat );
         moon.castShadow = true; //default is false
         moon.receiveShadow = true; //default+
         return moon;
     }
 
-    function createUniforms(texture)
+
+    function createDataMap(map, size)
     {
-        return uniform =
-        {
-                indexMatrix16x16:{ type: "fv1" , value: DitherPattern},
-                palette:{type:"v3v", value: GrayScalePallete},
-                paletteSize:{type:"i", value:8},
-                texture: { type: "t", value: null },
-                lightpos: {type: 'v3', value: new THREE.Vector3(0,30,20) },
-                noTexture:{type:"i", value:(texture == null) ? 1 : 0}
-        };
+        var dataTexture;
+        
+        dataTexture = new THREE.DataTexture
+        (
+        Uint8Array.from(map),
+        size,
+        size,
+        THREE.RGBFormat,
+        THREE.UnsignedByteType,
+        );
+
+        dataTexture.needsUpdate = true;
+        
+        return dataTexture;
     }
 
     function createPlantiodData(octaves, persistance, lacunarity, seed, noiseScale, offset, size)
@@ -948,7 +1190,9 @@
           var planetInfo = new MapGenerator(octaves, persistance, lacunarity, 
           seed, noiseScale, offset, size, false);
         
-          const dataTexture = new THREE.DataTexture
+          var dataTexture;
+
+          dataTexture = new THREE.DataTexture
           (
           Uint8Array.from(planetInfo.map),
           size,
@@ -956,10 +1200,12 @@
           THREE.RGBFormat,
           THREE.UnsignedByteType,
           );
-      
+  
           dataTexture.needsUpdate = true;
           
-          return new PlanetInformation(dataTexture, planetInfo.hasAtmo, planetInfo.hasLiquad, planetInfo.colors);
+          return new PlanetInformation(dataTexture, planetInfo.hasAtmo, 
+            planetInfo.hasLiquad, planetInfo.colors, planetInfo.url,
+            planetInfo.regionsInfo);
     }
 
     function createCloudData(octaves, persistance, lacunarity, seed, noiseScale, offset, size)
@@ -981,22 +1227,32 @@
           return new PlanetInformation(dataTexture, cloudInfo.hasAtmo, cloudInfo.hasLiquad);
     }
 
-    function generateName(parent)
+    function generateName(parent, fontsize, left, isInfo)
     {
+
         var roll = randomRange(0,10);
 
-        var newText = createTextLabel();
-        if(roll > 5)
-        newText.setHTML(word(randomRange(4, 12))+ "-" + Math.round(randomRange(0,1000)));
+        var newText = createTextLabel(fontsize, left);
+        var wordtxt = word(randomRange(3, 25));
+
+        if(roll > 5 && !isInfo)
+        newText.setHTML(wordtxt + "-" + Math.round(randomRange(0,1000)));
+        else if( !isInfo)
+        newText.setHTML(wordtxt); 
         else
-        newText.setHTML(word(randomRange(4, 12))); 
+        {
+        newText.setHTML("Poo Poo Man " 
+        + "<br>" +
+        "Gone To Jesus" 
+        + "<br>" +
+        "love Ponus" );
+        }
 
         newText.setParent(parent);
         container.appendChild(newText.element);
 
         return newText;
     }
-
     // Credit to THeK3nger - https://gist.github.com/THeK3nger/300b6a62b923c913223fbd29c8b5ac73
     //Sorry to any soul that bare's witness to this Abomination....May the gods have mercy on me
     function ShaderLoader (vertex_url, fragment_url, onLoad, Custom, onProgress, onError)   
@@ -1021,21 +1277,35 @@
         })}, onProgress, onError);
     }
     
-    //Dummy Methods To Pass Pararemtres threw the Async Loader func
+    //Methods to Setup and Save the Loaded Texts
+    //Aswell as pass in extra paramaratres if needed
     function setUpPlanet(init, vertex_text, fragment_text)
     {   
+        ShaderLoadList.planet.vertex = vertex_text;
+        ShaderLoadList.planet.fragment = fragment_text;
         createPlanet(init, vertex_text, fragment_text);
     }
     function setUpClouds(cloudsizeMult, vertex_text, fragment_text)
     {   
+
+        ShaderLoadList.cloud.vertex = vertex_text;
+        ShaderLoadList.cloud.fragment = fragment_text;
+
         createClouds(cloudsizeMult, vertex_text, fragment_text);
     }
     function setUpAtmosphere(atmoInfo, vertex_text, fragment_text)
     {   
+
+        ShaderLoadList.atmo.vertex = vertex_text;
+        ShaderLoadList.atmo.fragment = fragment_text;
+
         createAtmos(atmoInfo, vertex_text, fragment_text);
     }
   
     function SetUpFlatBelt(ringData, vertex_text, fragment_text)
-    {
-        CreateFlatBelt(ringData.data, vertex_text, fragment_text);
+    {                  
+        ShaderLoadList.ring.vertex = vertex_text;
+        ShaderLoadList.ring.fragment = fragment_text;
+
+        CreateFlatBelt(ringData, vertex_text, fragment_text);
     }

@@ -16,7 +16,6 @@ varying vec3 vecNormal;
 uniform vec3 lightpos;
 uniform vec4 skycolor;
 
-		
   struct DirectionalLight 
   {
     vec3 direction;
@@ -35,8 +34,7 @@ uniform vec4 skycolor;
 void main() 
 {
 
-   vec3 transformed = vec3( position );
-   vec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );
+   vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
    vec3 vWorldPosition = worldPosition.xyz;
     vec4 eyepos = modelViewMatrix * vec4 (position, 1.0);
     vec4 lighteye = viewMatrix * vec4 (lightpos, 1.0);
