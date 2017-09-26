@@ -16,12 +16,24 @@ var DitherPattern2 = [0,  48, 12, 60, 3,  51, 15, 63,
                       10, 58, 6,  54, 9,  57, 5,  53,
                       42, 26, 38, 22, 41, 25, 37, 21];
 
+
+var DitherPattern4x4 =  [ 0, 8, 1, 10,
+                          12, 4, 14, 6,
+                          3, 11, 1, 9,
+                          15, 7, 13, 5,
+                        ];
+var Dither3x3 = 
+[
+  6, 8, 4,
+  1, 0, 3,
+  5, 2, 7,
+];
 //This is giving Wierd Results at times so will need to test or change later
-var GrayScalePallete = [new THREE.Vector3( 0.0, 0.0, 0.0 ),
+var GrayScalePallete = [new THREE.Vector3( 0.0, 0.0, 0.0),
                         new THREE.Vector3( .14, .14, .14 ),
                         new THREE.Vector3( .28, .28, .28 ),
                         new THREE.Vector3( .43, .43, .43 ),
                         new THREE.Vector3( .57, .57, .57 ),
                         new THREE.Vector3( .71, .71, .71 ),
                         new THREE.Vector3( .85, .85, .85 ),
-                        new THREE.Vector3( .999, .999, .999)];
+                        new THREE.Vector3( .9, .9, .9)];

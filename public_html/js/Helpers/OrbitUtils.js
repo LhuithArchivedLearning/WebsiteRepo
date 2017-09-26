@@ -90,12 +90,8 @@ function DrawOrbit(planet, centre, currTimeD, auScale)
 
 
     lines.computeLineDistances();
-    moonorbit = new THREE.Line(lines, new THREE.LineDashedMaterial({
-    color: 0xffffff,
-    dashSize: 50,
-    gapSize: 100,
-    linewidth: 1
-  }));
+    moonorbit = new THREE.Line(lines, 
+        new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 1.5}));
   
   return moonorbit;
 }

@@ -15,6 +15,7 @@ varying vec3 eyenorm;
 varying vec3 vecNormal;
 uniform vec3 lightpos;
 uniform vec4 skycolor;
+varying vec4 lightDirection;
 
   struct DirectionalLight 
   {
@@ -35,21 +36,15 @@ void main()
 {
 
    vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-   vec3 vWorldPosition = worldPosition.xyz;
-    vec4 eyepos = modelViewMatrix * vec4 (position, 1.0);
-    vec4 lighteye = viewMatrix * vec4 (lightpos, 1.0);
-	vecNormal = (modelViewMatrix * vec4(normal, 0.0)).xyz;
-  
-    lightdir = lighteye.xyz - eyepos.xyz;
-    eyenorm = normalMatrix * normal;
+   vec4 vWorldPosition = worldPosition;
+	 vecNormal = (modelViewMatrix * vec4(normal, 0.0)).xyz;
 
-    float ndotl = normalize(dot(normalize (eyenorm), normalize (lightdir)));
-    vec3 normalDirection = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+    vec4 normalDirection = normalize((modelViewMatrix * vec4(normal, 0.0)));
     vUv = uv;
 
-    vec3 lightDirection = normalize(directionalLights[0].direction);
+    lightDirection = normalize(vec4(directionalLights[0].direction, 1.0) );
 
-   vec3 viewDirection = normalize(cameraPosition.xyz - vWorldPosition);
+   vec4 viewDirection = normalize(vec4(cameraPosition, 1.0) - worldPosition);
 
    angleIncidence = acos(dot(lightDirection, normalDirection)) / PI;
 
@@ -57,10 +52,10 @@ void main()
     (1.0 - (clamp(angleIncidence, 0.5, 0.5 + transitionWidth) - 0.5) 
     / transitionWidth);
 
-   float angleToViewer = sin(acos(dot(normalDirection, viewDirection)));
+   float angleToViewer = clamp(sin(acos(dot(normalDirection, viewDirection))), 0.0, 1.0);
 
    float perspectiveFactor = 0.3 + 0.2 * pow((angleToViewer), fresnelExp)
-     + 0.5 * pow((angleToViewer), fresnelExp * 20.0);
+     + 0.5 * pow((angleToViewer), fresnelExp * 15.0);
 
     col = vec4(1.0, 1.0, 1.0, 1.0) * perspectiveFactor * shadeFactor;
  

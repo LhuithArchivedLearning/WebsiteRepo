@@ -9599,27 +9599,25 @@ if (jQuery) {
         }
 
         function cycleTo(n) {
-          var diff = center % count - n;
-
-          // Account for wraparound.
-          if (!noWrap) {
-            if (diff < 0) {
-              if (Math.abs(diff + count) < Math.abs(diff)) {
-                diff += count;
-              }
-            } else if (diff > 0) {
-              if (Math.abs(diff - count) < diff) {
-                diff -= count;
-              }
-            }
+          var diff = (center % count) - n;
+          
+                    // Account for wraparound.
+                    if (!noWrap) {
+                      if (diff < 0) {
+                        if (Math.abs(diff + count) < Math.abs(diff)) { diff += count; }
+          
+                      } else if (diff > 0) {
+                        if (Math.abs(diff - count) < diff) { diff -= count; }
+                      }
           }
 
-          // Call prev or next accordingly.
-          if (diff < 0) {
-            view.trigger('carouselNext', [Math.abs(diff)]);
-          } else if (diff > 0) {
-            view.trigger('carouselPrev', [diff]);
-          }
+               // Call prev or next accordingly.
+               if (diff < 0) {
+                view.trigger('carouselNext', [Math.abs(diff)]);
+    
+              } else if (diff > 0) {
+                view.trigger('carouselPrev', [diff]);
+              }
         }
 
         function tap(e) {

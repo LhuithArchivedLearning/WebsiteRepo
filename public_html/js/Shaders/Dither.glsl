@@ -1,11 +1,10 @@
 
 		uniform vec3 palette[8];
 		uniform int paletteSize;
-		uniform int noTexture;
-		const float lightnessSteps = 4.0;	
+		const float lightnessSteps = 3.0;	
 
-		uniform float indexMatrix16x16[64];
-		const int num = 64;
+		uniform float indexMatrix16x16[16];
+		const int num = 9;
 		
 		float lightnessStep(float l) 
 			{
@@ -15,21 +14,21 @@
 
 			float indexValue() 
 			{
-				float x = (mod(gl_FragCoord.x, 8.0));
-				float y = (mod(gl_FragCoord.y, 8.0));
+				float x = (mod(gl_FragCoord.x, 4.0));
+				float y = (mod(gl_FragCoord.y, 4.0));
 				
-				float grabby = 2.0;
+				float grabby = 0.0;
 				
-				for(int i = 0; i < 64; i++)
+				for(int i = 0; i < 16; i++)
 				{
-					if(i == int(x + (y * 8.0)))
+					if(i == int(x + (y * 4.0)))
 					{
 						grabby = indexMatrix16x16[i];
 						break;
 					}
 				}
 
-				return grabby/64.0;
+				return grabby/16.0;
 			}
 
 			float ditherMap(float color) 
@@ -49,12 +48,14 @@
 
 			vec3 rgbToHsl(vec3 c )
 			{
-			float h = 0.0;
+				float h = 0.0;
 				float s = 0.0;
 				float l = 0.0;
+
 				float r = c.r;
 				float g = c.g;
 				float b = c.b;
+
 				float cMin = min( r, min( g, b ) );
 				float cMax = max( r, max( g, b ) );
 
@@ -63,7 +64,8 @@
 					float cDelta = cMax - cMin;
 					
 					//s = l < .05 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) ); Original
-					s = l < .0 ? cDelta / ( cMax + cMin ) : cDelta / ( 2.0 - ( cMax + cMin ) );
+					s = l < .0 ? cDelta / ( cMax + cMin ) : cDelta /
+					 ( 2.0 - ( cMax + cMin ) );
 					
 					if ( r == cMax ) {
 						h = ( g - b ) / cDelta;
@@ -92,8 +94,8 @@
 			vec3 hsl = rgbToHsl(color);
 
 			vec3 ret[2];
-			vec3 closest = vec3(-2, 0, 0);
-			vec3 secondClosest = vec3(-2, 0, 0);
+			vec3 closest = vec3(0, 0, 0);
+			vec3 secondClosest = vec3(0, 0, 0);
 			vec3 temp;
 
 			for (int i = 0; i < 8; ++i) 

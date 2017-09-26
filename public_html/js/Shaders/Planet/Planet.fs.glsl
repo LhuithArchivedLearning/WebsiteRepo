@@ -7,7 +7,7 @@ varying vec2 vUv;
 
 varying vec3 vecNormal;
 varying vec3 vWorldPosition;
-
+uniform int noTexture;
 
 		//Refer the Text Parse in Main.js, replaced this Sexy Text with Dither Methods,
 		//I just didnt want it cluttering shizz up
@@ -34,7 +34,7 @@ varying vec3 vWorldPosition;
 		void main()
 		{
 			vec3 sumDirLights = (clamp(dot(normalize(directionalLights[0].direction), 
-			vecNormal), 0.0, 0.8) * directionalLights[0].color) * 1.01;
+			vecNormal), 0.0, 0.65) * directionalLights[0].color) * 1.1;
 
 			float shadowValue = getShadow(directionalShadowMap[ 0 ], directionalLights[0].shadowMapSize, 
 			directionalLights[0].shadowBias, directionalLights[0].shadowRadius, vDirectionalShadowCoord[0] );
@@ -42,7 +42,6 @@ varying vec3 vWorldPosition;
 			vec3 shadowVal = vec3(shadowValue,shadowValue,shadowValue);
 			vec4 shadowDither = vec4(dither(shadowVal), 1.0);
 			vec4 light = vec4(dither(sumDirLights), 1.0);
-
 			vec4 color;
 
 			if(noTexture == 1)
